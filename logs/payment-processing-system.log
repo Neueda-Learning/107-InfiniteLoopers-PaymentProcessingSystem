@@ -1535,3 +1535,729 @@ Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No q
 2026-08-04T10:07:36.764Z  INFO 12500 --- [payment-processing-system] [http-nio-8080-exec-7] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-9F83F220D15543FFA4140FD7E14D28B0
 2026-08-04T10:07:36.769Z  INFO 12500 --- [payment-processing-system] [http-nio-8080-exec-7] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-9F83F220D15543FFA4140FD7E14D28B0
 2026-08-04T10:07:36.771Z  INFO 12500 --- [payment-processing-system] [http-nio-8080-exec-7] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-9F83F220D15543FFA4140FD7E14D28B0
+2026-08-04T10:51:59.644Z  INFO 12500 --- [payment-processing-system] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 2 deletions, 0 modifications)
+2026-08-04T10:51:59.680Z  INFO 12500 --- [payment-processing-system] [Thread-5] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T10:51:59.806Z  INFO 12500 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T10:51:59.815Z  INFO 12500 --- [payment-processing-system] [Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:51:59.818Z  INFO 12500 --- [payment-processing-system] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-08-04T10:51:59.849Z  INFO 12500 --- [payment-processing-system] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+2026-08-04T10:52:00.516Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:52:00.516Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:52:02.477Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:52:02.597Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 102 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:52:03.883Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T10:52:03.886Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:52:03.887Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:52:03.979Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3454 ms
+2026-08-04T10:52:04.155Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-08-04T10:52:04.169Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection com.mysql.cj.jdbc.ConnectionImpl@5d2df621
+2026-08-04T10:52:04.169Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-08-04T10:52:04.172Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:52:04.232Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.026s)
+2026-08-04T10:52:04.249Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:52:04.250Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:52:04.295Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:52:04.403Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:52:04.407Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:52:04.409Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:52:05.434Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:52:05.472Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:06.077Z  WARN 12500 --- [payment-processing-system] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+2026-08-04T10:52:06.077Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:06.078Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2026-08-04T10:52:06.084Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+2026-08-04T10:52:06.085Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-08-04T10:52:06.154Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-08-04T10:52:06.158Z ERROR 12500 --- [payment-processing-system] [restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1380) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1219) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1191) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.0.jar:4.1.0]
+	at com.payment.payment_processing_system.PaymentProcessingSystemApplication.main(PaymentProcessingSystemApplication.java:10) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:482) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:352) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineConstructorsFromBeanPostProcessors(AbstractAutowireCapableBeanFactory.java:1319) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1216) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:229) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1769) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1658) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 24 common frames omitted
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [com.payment.payment_processing_system.service.impl.PaymentServiceImpl] from ClassLoader [org.springframework.boot.devtools.restart.classloader.RestartClassLoader@64f0dff]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.util.ReflectionUtils.doWithLocalMethods(ReflectionUtils.java:320) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:460) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 38 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: com/payment/payment_processing_system/dto/TransactionStatusHistoryResponse
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3010) ~[na:na]
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2329) ~[na:na]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465) ~[spring-core-7.0.8.jar:7.0.8]
+	... 40 common frames omitted
+Caused by: java.lang.ClassNotFoundException: com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:580) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:547) ~[na:na]
+	at org.springframework.boot.devtools.restart.classloader.RestartClassLoader.loadClass(RestartClassLoader.java:123) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	... 44 common frames omitted
+
+2026-08-04T10:52:13.818Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:52:13.841Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:52:15.294Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:52:15.604Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 270 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:52:16.207Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T10:52:16.211Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:52:16.211Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:52:16.282Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2405 ms
+2026-08-04T10:52:16.380Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-08-04T10:52:16.389Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1f369edc
+2026-08-04T10:52:16.390Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-08-04T10:52:16.394Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:52:16.443Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.019s)
+2026-08-04T10:52:16.457Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:52:16.458Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:52:16.488Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:52:16.604Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:52:16.608Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:52:16.610Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:52:17.242Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:52:17.283Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:18.356Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-08-04T10:52:18.364Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Started PaymentProcessingSystemApplication in 5.083 seconds (process running for 4538.321)
+2026-08-04T10:52:18.366Z  INFO 12500 --- [payment-processing-system] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-08-04T10:52:24.072Z  INFO 10008 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Starting PaymentIdempotencyIntegrationTests using Java 25.0.3 with PID 10008 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:52:24.076Z  INFO 10008 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:52:26.546Z  INFO 10008 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:52:26.738Z  INFO 10008 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 173 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:52:28.356Z  INFO 10008 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-08-04T10:52:28.391Z  INFO 10008 --- [payment-processing-system] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:52:28.393Z  INFO 10008 --- [payment-processing-system] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:52:28.576Z  INFO 10008 --- [payment-processing-system] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4447 ms
+2026-08-04T10:52:29.420Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-04T10:52:29.813Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@534fc1f7
+2026-08-04T10:52:29.816Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-04T10:52:29.940Z  INFO 10008 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:52:30.191Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.072s)
+2026-08-04T10:52:30.222Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:52:30.231Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:52:30.617Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:52:30.826Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-08-04T10:52:32.058Z  INFO 10008 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:52:32.238Z  WARN 10008 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:52:32.269Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:52:34.396Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:52:34.483Z  INFO 10008 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:34.721Z  INFO 10008 --- [payment-processing-system] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-04T10:52:39.202Z  INFO 10008 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 53847 (http) with context path '/'
+2026-08-04T10:52:39.220Z  INFO 10008 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Started PaymentIdempotencyIntegrationTests in 16.182 seconds (process running for 19.713)
+2026-08-04T10:52:40.393Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-04T10:52:40.395Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-04T10:52:40.406Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2026-08-04T10:52:40.622Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:52:41.024Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-9DB2BF16E44E4A199DB564A224D02610
+2026-08-04T10:52:41.036Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-9DB2BF16E44E4A199DB564A224D02610
+2026-08-04T10:52:41.042Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-9DB2BF16E44E4A199DB564A224D02610
+2026-08-04T10:52:41.046Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-9DB2BF16E44E4A199DB564A224D02610
+2026-08-04T10:52:41.531Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:52:41.552Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.service.impl.PaymentServiceImpl    : Returning existing transaction TXN-9DB2BF16E44E4A199DB564A224D02610 for idempotency key IDEMPTEST-d908d9968240402ca1d5505376c54f31
+2026-08-04T10:52:41.644Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:52:41.673Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-62EB975276C142C9851C2049782986AD
+2026-08-04T10:52:41.677Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-62EB975276C142C9851C2049782986AD
+2026-08-04T10:52:41.683Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-62EB975276C142C9851C2049782986AD
+2026-08-04T10:52:41.690Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-62EB975276C142C9851C2049782986AD
+2026-08-04T10:52:41.723Z  INFO 10008 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:52:41.735Z ERROR 10008 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.service.impl.PaymentServiceImpl    : Duplicate payment blocked: The provided idempotency key has already been used for a different payment request.
+2026-08-04T10:52:41.746Z ERROR 10008 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.exception.GlobalExceptionHandler   : Duplicate payment detected: The provided idempotency key has already been used for a different payment request.
+2026-08-04T10:52:41.805Z  INFO 10008 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T10:52:41.809Z  INFO 10008 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T10:52:41.812Z  INFO 10008 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T10:52:41.816Z  INFO 10008 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T10:52:41.846Z  INFO 10008 --- [payment-processing-system] [main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-08-04T10:52:42.125Z  INFO 10008 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Starting PaymentProcessingSystemApplicationTests using Java 25.0.3 with PID 10008 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:52:42.125Z  INFO 10008 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:52:43.003Z  INFO 10008 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:52:43.043Z  INFO 10008 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:52:43.367Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-08-04T10:52:43.383Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@280de5ae
+2026-08-04T10:52:43.384Z  INFO 10008 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-08-04T10:52:43.386Z  INFO 10008 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:52:43.437Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.023s)
+2026-08-04T10:52:43.458Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:52:43.461Z  INFO 10008 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:52:43.527Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:52:43.636Z  INFO 10008 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:52:43.644Z  WARN 10008 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:52:43.648Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:52:43.844Z  INFO 10008 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:52:43.864Z  INFO 10008 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:44.576Z  INFO 10008 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Started PaymentProcessingSystemApplicationTests in 2.731 seconds (process running for 25.07)
+2026-08-04T10:52:44.728Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T10:52:44.734Z  INFO 10008 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T10:52:44.744Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:44.750Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-04T10:52:44.763Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-04T10:52:44.797Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:52:44.799Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-08-04T10:52:44.805Z  INFO 10008 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-08-04T10:56:25.197Z  INFO 12500 --- [payment-processing-system] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 2 deletions, 0 modifications)
+2026-08-04T10:56:25.205Z  INFO 12500 --- [payment-processing-system] [Thread-12] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T10:56:25.215Z  INFO 12500 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T10:56:25.220Z  INFO 12500 --- [payment-processing-system] [Thread-12] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:56:25.227Z  INFO 12500 --- [payment-processing-system] [Thread-12] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown initiated...
+2026-08-04T10:56:25.243Z  INFO 12500 --- [payment-processing-system] [Thread-12] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown completed.
+2026-08-04T10:56:25.606Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:56:25.607Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:56:26.280Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:56:26.324Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 41 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:56:26.755Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T10:56:26.756Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:56:26.757Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:56:26.831Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1217 ms
+2026-08-04T10:56:26.932Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Starting...
+2026-08-04T10:56:26.941Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-6 - Added connection com.mysql.cj.jdbc.ConnectionImpl@19435ee4
+2026-08-04T10:56:26.942Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Start completed.
+2026-08-04T10:56:26.944Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:56:26.979Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.012s)
+2026-08-04T10:56:26.999Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:56:27.000Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:56:27.034Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:56:27.153Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:56:27.170Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:56:27.171Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:56:27.759Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:56:27.776Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:56:28.199Z  WARN 12500 --- [payment-processing-system] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+2026-08-04T10:56:28.200Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:56:28.201Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown initiated...
+2026-08-04T10:56:28.208Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Shutdown completed.
+2026-08-04T10:56:28.209Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-08-04T10:56:28.218Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-08-04T10:56:28.227Z ERROR 12500 --- [payment-processing-system] [restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1380) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1219) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1191) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.0.jar:4.1.0]
+	at com.payment.payment_processing_system.PaymentProcessingSystemApplication.main(PaymentProcessingSystemApplication.java:10) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:482) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:352) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineConstructorsFromBeanPostProcessors(AbstractAutowireCapableBeanFactory.java:1319) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1216) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:229) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1769) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1658) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 24 common frames omitted
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [com.payment.payment_processing_system.service.impl.PaymentServiceImpl] from ClassLoader [org.springframework.boot.devtools.restart.classloader.RestartClassLoader@4377e92b]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.util.ReflectionUtils.doWithLocalMethods(ReflectionUtils.java:320) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:460) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 38 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: com/payment/payment_processing_system/dto/TransactionStatusHistoryResponse
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3010) ~[na:na]
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2329) ~[na:na]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465) ~[spring-core-7.0.8.jar:7.0.8]
+	... 40 common frames omitted
+Caused by: java.lang.ClassNotFoundException: com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:580) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:547) ~[na:na]
+	at org.springframework.boot.devtools.restart.classloader.RestartClassLoader.loadClass(RestartClassLoader.java:123) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	... 44 common frames omitted
+
+2026-08-04T10:56:36.419Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:56:36.420Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:56:37.715Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:56:37.750Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 32 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:56:38.060Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T10:56:38.135Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:56:38.136Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:56:38.317Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1883 ms
+2026-08-04T10:56:38.483Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Starting...
+2026-08-04T10:56:38.489Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-7 - Added connection com.mysql.cj.jdbc.ConnectionImpl@65e1fe97
+2026-08-04T10:56:38.490Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Start completed.
+2026-08-04T10:56:38.492Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:56:38.526Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.012s)
+2026-08-04T10:56:38.538Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:56:38.539Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:56:38.566Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:56:38.625Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:56:38.631Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:56:38.634Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:56:39.439Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:56:39.456Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:56:40.304Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-08-04T10:56:40.309Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Started PaymentProcessingSystemApplication in 4.024 seconds (process running for 4800.266)
+2026-08-04T10:56:40.312Z  INFO 12500 --- [payment-processing-system] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-08-04T10:56:45.843Z  INFO 4492 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Starting PaymentIdempotencyIntegrationTests using Java 25.0.3 with PID 4492 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:56:45.846Z  INFO 4492 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:56:48.235Z  INFO 4492 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:56:48.450Z  INFO 4492 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 198 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:56:50.026Z  INFO 4492 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-08-04T10:56:50.095Z  INFO 4492 --- [payment-processing-system] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T10:56:50.097Z  INFO 4492 --- [payment-processing-system] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T10:56:50.253Z  INFO 4492 --- [payment-processing-system] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4330 ms
+2026-08-04T10:56:51.088Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-04T10:56:51.595Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@19e2db7c
+2026-08-04T10:56:51.599Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-04T10:56:51.679Z  INFO 4492 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:56:51.869Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.069s)
+2026-08-04T10:56:51.902Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:56:51.910Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:56:52.195Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:56:52.371Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-08-04T10:56:53.410Z  INFO 4492 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:56:53.593Z  WARN 4492 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:56:53.621Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:56:55.670Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:56:55.771Z  INFO 4492 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:56:56.008Z  INFO 4492 --- [payment-processing-system] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-04T10:57:00.473Z  INFO 4492 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 64552 (http) with context path '/'
+2026-08-04T10:57:00.486Z  INFO 4492 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Started PaymentIdempotencyIntegrationTests in 15.407 seconds (process running for 19.083)
+2026-08-04T10:57:01.568Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-04T10:57:01.570Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-04T10:57:01.573Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-08-04T10:57:01.791Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:57:02.174Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-DE25620BA6934C2CB42B672CEBAAB348
+2026-08-04T10:57:02.185Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-DE25620BA6934C2CB42B672CEBAAB348
+2026-08-04T10:57:02.193Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-DE25620BA6934C2CB42B672CEBAAB348
+2026-08-04T10:57:02.198Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-DE25620BA6934C2CB42B672CEBAAB348
+2026-08-04T10:57:02.489Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:57:02.514Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.service.impl.PaymentServiceImpl    : Returning existing transaction TXN-DE25620BA6934C2CB42B672CEBAAB348 for idempotency key IDEMPTEST-c80b5ee890064aa19c8296cbdf30e2ea
+2026-08-04T10:57:02.634Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:57:02.657Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-E377415DAF344062B4F5B732AB5332C3
+2026-08-04T10:57:02.673Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-E377415DAF344062B4F5B732AB5332C3
+2026-08-04T10:57:02.678Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-E377415DAF344062B4F5B732AB5332C3
+2026-08-04T10:57:02.688Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-E377415DAF344062B4F5B732AB5332C3
+2026-08-04T10:57:02.724Z  INFO 4492 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T10:57:02.741Z ERROR 4492 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.service.impl.PaymentServiceImpl    : Duplicate payment blocked: The provided idempotency key has already been used for a different payment request.
+2026-08-04T10:57:02.754Z ERROR 4492 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.exception.GlobalExceptionHandler   : Duplicate payment detected: The provided idempotency key has already been used for a different payment request.
+2026-08-04T10:57:02.847Z  INFO 4492 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T10:57:02.851Z  INFO 4492 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T10:57:02.854Z  INFO 4492 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T10:57:02.857Z  INFO 4492 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T10:57:02.883Z  INFO 4492 --- [payment-processing-system] [main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-08-04T10:57:03.021Z  INFO 4492 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Starting PaymentProcessingSystemApplicationTests using Java 25.0.3 with PID 4492 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T10:57:03.029Z  INFO 4492 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T10:57:03.815Z  INFO 4492 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T10:57:03.939Z  INFO 4492 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 117 ms. Found 4 JPA repository interfaces.
+2026-08-04T10:57:04.246Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-08-04T10:57:04.258Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2676ac68
+2026-08-04T10:57:04.259Z  INFO 4492 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-08-04T10:57:04.263Z  INFO 4492 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T10:57:04.317Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.025s)
+2026-08-04T10:57:04.338Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T10:57:04.341Z  INFO 4492 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T10:57:04.425Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T10:57:04.555Z  INFO 4492 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T10:57:04.561Z  WARN 4492 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T10:57:04.564Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T10:57:04.810Z  INFO 4492 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T10:57:04.837Z  INFO 4492 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:57:05.610Z  INFO 4492 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Started PaymentProcessingSystemApplicationTests in 2.727 seconds (process running for 24.207)
+2026-08-04T10:57:05.725Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T10:57:05.733Z  INFO 4492 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T10:57:05.740Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:57:05.751Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-04T10:57:05.764Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-04T10:57:05.794Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T10:57:05.795Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-08-04T10:57:05.801Z  INFO 4492 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-08-04T11:11:45.196Z  INFO 12500 --- [payment-processing-system] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 3 class path changes (0 additions, 3 deletions, 0 modifications)
+2026-08-04T11:11:45.244Z  INFO 12500 --- [payment-processing-system] [Thread-19] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T11:11:45.248Z  INFO 12500 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T11:11:45.251Z  INFO 12500 --- [payment-processing-system] [Thread-19] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:11:45.251Z  INFO 12500 --- [payment-processing-system] [Thread-19] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown initiated...
+2026-08-04T11:11:45.255Z  INFO 12500 --- [payment-processing-system] [Thread-19] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Shutdown completed.
+2026-08-04T11:11:45.553Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T11:11:45.554Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T11:11:46.236Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T11:11:46.309Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 70 ms. Found 4 JPA repository interfaces.
+2026-08-04T11:11:46.700Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T11:11:46.702Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T11:11:46.703Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T11:11:46.778Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1221 ms
+2026-08-04T11:11:47.099Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Starting...
+2026-08-04T11:11:47.110Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-8 - Added connection com.mysql.cj.jdbc.ConnectionImpl@221fe7df
+2026-08-04T11:11:47.111Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Start completed.
+2026-08-04T11:11:47.115Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T11:11:47.146Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.014s)
+2026-08-04T11:11:47.159Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T11:11:47.161Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T11:11:47.185Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T11:11:47.519Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T11:11:47.523Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T11:11:47.524Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T11:11:48.732Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T11:11:48.764Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:11:49.248Z  WARN 12500 --- [payment-processing-system] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+2026-08-04T11:11:49.249Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:11:49.253Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown initiated...
+2026-08-04T11:11:49.260Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-8 - Shutdown completed.
+2026-08-04T11:11:49.262Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-08-04T11:11:49.397Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-08-04T11:11:49.434Z ERROR 12500 --- [payment-processing-system] [restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'paymentController' defined in file [C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes\com\payment\payment_processing_system\controller\PaymentController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1380) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1219) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1225) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1191) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.8.jar:7.0.8]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.1.0.jar:4.1.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.1.0.jar:4.1.0]
+	at com.payment.payment_processing_system.PaymentProcessingSystemApplication.main(PaymentProcessingSystemApplication.java:10) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'paymentServiceImpl': Lookup method resolution failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:482) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:352) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineConstructorsFromBeanPostProcessors(AbstractAutowireCapableBeanFactory.java:1319) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1216) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:229) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1769) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1658) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912) ~[spring-beans-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 24 common frames omitted
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [com.payment.payment_processing_system.service.impl.PaymentServiceImpl] from ClassLoader [org.springframework.boot.devtools.restart.classloader.RestartClassLoader@3764dfbe]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.util.ReflectionUtils.doWithLocalMethods(ReflectionUtils.java:320) ~[spring-core-7.0.8.jar:7.0.8]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.checkLookupMethods(AutowiredAnnotationBeanPostProcessor.java:460) ~[spring-beans-7.0.8.jar:7.0.8]
+	... 38 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: com/payment/payment_processing_system/dto/TransactionStatusHistoryResponse
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3010) ~[na:na]
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2329) ~[na:na]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465) ~[spring-core-7.0.8.jar:7.0.8]
+	... 40 common frames omitted
+Caused by: java.lang.ClassNotFoundException: com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:580) ~[na:na]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	at java.base/java.lang.Class.forName0(Native Method) ~[na:na]
+	at java.base/java.lang.Class.forName(Class.java:547) ~[na:na]
+	at org.springframework.boot.devtools.restart.classloader.RestartClassLoader.loadClass(RestartClassLoader.java:123) ~[spring-boot-devtools-4.1.0.jar:4.1.0]
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[na:na]
+	... 44 common frames omitted
+
+2026-08-04T11:12:44.292Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Starting PaymentProcessingSystemApplication using Java 25.0.3 with PID 12500 (C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem\target\classes started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T11:12:44.292Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T11:12:44.723Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T11:12:44.753Z  INFO 12500 --- [payment-processing-system] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 28 ms. Found 4 JPA repository interfaces.
+2026-08-04T11:12:45.244Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-08-04T11:12:45.248Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T11:12:45.248Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T11:12:45.350Z  INFO 12500 --- [payment-processing-system] [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1055 ms
+2026-08-04T11:12:45.408Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Starting...
+2026-08-04T11:12:45.415Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-9 - Added connection com.mysql.cj.jdbc.ConnectionImpl@27fceeff
+2026-08-04T11:12:45.416Z  INFO 12500 --- [payment-processing-system] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-9 - Start completed.
+2026-08-04T11:12:45.417Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T11:12:45.450Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.012s)
+2026-08-04T11:12:45.463Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T11:12:45.464Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T11:12:45.489Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T11:12:45.533Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T11:12:45.536Z  WARN 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T11:12:45.537Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T11:12:46.159Z  INFO 12500 --- [payment-processing-system] [restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T11:12:46.175Z  INFO 12500 --- [payment-processing-system] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:12:47.211Z  INFO 12500 --- [payment-processing-system] [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-08-04T11:12:47.214Z  INFO 12500 --- [payment-processing-system] [restartedMain] c.p.p.PaymentProcessingSystemApplication : Started PaymentProcessingSystemApplication in 3.084 seconds (process running for 5767.17)
+2026-08-04T11:12:47.216Z  INFO 12500 --- [payment-processing-system] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-08-04T11:12:56.926Z  INFO 12224 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Starting PaymentIdempotencyIntegrationTests using Java 25.0.3 with PID 12224 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T11:12:56.929Z  INFO 12224 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T11:12:59.444Z  INFO 12224 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T11:12:59.692Z  INFO 12224 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 194 ms. Found 4 JPA repository interfaces.
+2026-08-04T11:13:01.403Z  INFO 12224 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-08-04T11:13:01.432Z  INFO 12224 --- [payment-processing-system] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-04T11:13:01.434Z  INFO 12224 --- [payment-processing-system] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-08-04T11:13:01.598Z  INFO 12224 --- [payment-processing-system] [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4475 ms
+2026-08-04T11:13:02.476Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-04T11:13:02.969Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@72ec16f8
+2026-08-04T11:13:02.973Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-04T11:13:03.034Z  INFO 12224 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T11:13:03.195Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.071s)
+2026-08-04T11:13:03.238Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T11:13:03.244Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T11:13:03.621Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T11:13:03.793Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-08-04T11:13:05.053Z  INFO 12224 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T11:13:05.190Z  WARN 12224 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T11:13:05.219Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T11:13:07.274Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T11:13:07.375Z  INFO 12224 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:13:07.579Z  INFO 12224 --- [payment-processing-system] [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-04T11:13:12.043Z  INFO 12224 --- [payment-processing-system] [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 57031 (http) with context path '/'
+2026-08-04T11:13:12.059Z  INFO 12224 --- [payment-processing-system] [main] c.p.p.PaymentIdempotencyIntegrationTests : Started PaymentIdempotencyIntegrationTests in 15.957 seconds (process running for 20.917)
+2026-08-04T11:13:13.274Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-04T11:13:13.274Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-04T11:13:13.277Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-08-04T11:13:13.519Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T11:13:13.912Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-256F32D679F24B52B299E19DBD900019
+2026-08-04T11:13:13.919Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-256F32D679F24B52B299E19DBD900019
+2026-08-04T11:13:13.925Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-256F32D679F24B52B299E19DBD900019
+2026-08-04T11:13:13.929Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-1] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-256F32D679F24B52B299E19DBD900019
+2026-08-04T11:13:14.218Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T11:13:14.241Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-2] c.p.p.service.impl.PaymentServiceImpl    : Returning existing transaction TXN-256F32D679F24B52B299E19DBD900019 for idempotency key IDEMPTEST-b7189f1b6eb44d429f40ac1a2b2a28da
+2026-08-04T11:13:14.326Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T11:13:14.354Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction created: TXN-4D4F13704F6B4C3DAE2BE701A6E682E8
+2026-08-04T11:13:14.358Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction validated: TXN-4D4F13704F6B4C3DAE2BE701A6E682E8
+2026-08-04T11:13:14.363Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction sent: TXN-4D4F13704F6B4C3DAE2BE701A6E682E8
+2026-08-04T11:13:14.367Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-3] c.p.p.service.impl.PaymentServiceImpl    : Transaction completed: TXN-4D4F13704F6B4C3DAE2BE701A6E682E8
+2026-08-04T11:13:14.399Z  INFO 12224 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.controller.PaymentController       : POST /api/payments/send - Initiating payment from account: 100000000001
+2026-08-04T11:13:14.410Z ERROR 12224 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.service.impl.PaymentServiceImpl    : Duplicate payment blocked: The provided idempotency key has already been used for a different payment request.
+2026-08-04T11:13:14.420Z ERROR 12224 --- [payment-processing-system] [http-nio-auto-1-exec-4] c.p.p.exception.GlobalExceptionHandler   : Duplicate payment detected: The provided idempotency key has already been used for a different payment request.
+2026-08-04T11:13:14.494Z  INFO 12224 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T11:13:14.498Z  INFO 12224 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T11:13:14.501Z  INFO 12224 --- [payment-processing-system] [main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests]: PaymentProcessingSystemApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-04T11:13:14.515Z  INFO 12224 --- [payment-processing-system] [main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.payment.payment_processing_system.PaymentProcessingSystemApplication for test class com.payment.payment_processing_system.PaymentProcessingSystemApplicationTests
+2026-08-04T11:13:14.537Z  INFO 12224 --- [payment-processing-system] [main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-08-04T11:13:14.701Z  INFO 12224 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Starting PaymentProcessingSystemApplicationTests using Java 25.0.3 with PID 12224 (started by Administrator in C:\Users\Administrator\Desktop\project\107-InfiniteLoopers-PaymentProcessingSystem)
+2026-08-04T11:13:14.704Z  INFO 12224 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2026-08-04T11:13:15.495Z  INFO 12224 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-04T11:13:15.621Z  INFO 12224 --- [payment-processing-system] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 94 ms. Found 4 JPA repository interfaces.
+2026-08-04T11:13:16.092Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-08-04T11:13:16.121Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@47fd0905
+2026-08-04T11:13:16.122Z  INFO 12224 --- [payment-processing-system] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-08-04T11:13:16.125Z  INFO 12224 --- [payment-processing-system] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC (MySQL 8.0)
+2026-08-04T11:13:16.177Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.015s)
+2026-08-04T11:13:16.204Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `payment_processing_db`: 5
+2026-08-04T11:13:16.206Z  INFO 12224 --- [payment-processing-system] [main] o.f.core.internal.command.DbMigrate      : Schema `payment_processing_db` is up to date. No migration necessary.
+2026-08-04T11:13:16.256Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-08-04T11:13:16.334Z  INFO 12224 --- [payment-processing-system] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-04T11:13:16.339Z  WARN 12224 --- [payment-processing-system] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-04T11:13:16.342Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/payment_processing_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: payment_processing_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-04T11:13:16.562Z  INFO 12224 --- [payment-processing-system] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-04T11:13:16.581Z  INFO 12224 --- [payment-processing-system] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:13:17.319Z  INFO 12224 --- [payment-processing-system] [main] .PaymentProcessingSystemApplicationTests : Started PaymentProcessingSystemApplicationTests in 2.783 seconds (process running for 26.178)
+2026-08-04T11:13:17.442Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-04T11:13:17.449Z  INFO 12224 --- [payment-processing-system] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-04T11:13:17.455Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:13:17.460Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-04T11:13:17.487Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-04T11:13:17.523Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-04T11:13:17.525Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-08-04T11:13:17.529Z  INFO 12224 --- [payment-processing-system] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.

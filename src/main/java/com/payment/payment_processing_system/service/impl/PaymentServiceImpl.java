@@ -25,6 +25,7 @@ import com.payment.payment_processing_system.validation.AccountValidator;
 import com.payment.payment_processing_system.validation.BalanceValidator;
 import com.payment.payment_processing_system.validation.PaymentValidator;
 import com.payment.payment_processing_system.validation.RetryValidator;
+import com.payment.payment_processing_system.validation.StatusTransitionValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final AccountValidator accountValidator;
     private final BalanceValidator balanceValidator;
     private final RetryValidator retryValidator;
+    private final StatusTransitionValidator statusTransitionValidator;
 
     /**
      * Processes a payment transaction through its full lifecycle:
@@ -142,6 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("Transaction created: {}", transactionId);
 
             // Step 10: Validate payment → status VALIDATED
+            statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.VALIDATED);
             transaction.setPaymentStatus(PaymentStatus.VALIDATED);
             transaction.setValidatedTime(LocalDateTime.now());
             transaction = paymentTransactionRepository.save(transaction);
@@ -155,6 +158,7 @@ public class PaymentServiceImpl implements PaymentService {
             accountRepository.save(receiverAccount);
 
             // Step 12: Status → SENT
+            statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.SENT);
             transaction.setPaymentStatus(PaymentStatus.SENT);
             transaction.setSentTime(LocalDateTime.now());
             transaction = paymentTransactionRepository.save(transaction);
@@ -162,6 +166,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("Transaction sent: {}", transactionId);
 
             // Step 13: Status → COMPLETED
+            statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.COMPLETED);
             transaction.setPaymentStatus(PaymentStatus.COMPLETED);
             transaction.setCompletedTime(LocalDateTime.now());
             transaction = paymentTransactionRepository.save(transaction);
@@ -433,6 +438,8 @@ public class PaymentServiceImpl implements PaymentService {
      */
     private void markAsFailed(PaymentTransaction transaction) {
         try {
+            statusTransitionValidator.validate(
+                    transaction.getTransactionId(), transaction.getPaymentStatus(), PaymentStatus.FAILED);
             transaction.setPaymentStatus(PaymentStatus.FAILED);
             transaction.setFailedTime(LocalDateTime.now());
             paymentTransactionRepository.save(transaction);

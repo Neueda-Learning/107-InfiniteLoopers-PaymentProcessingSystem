@@ -2,6 +2,7 @@ package com.payment.payment_processing_system.controller;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
 import com.payment.payment_processing_system.dto.PaymentResponse;
+import jakarta.validation.Valid;
 import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.enums.PaymentStatus;
@@ -38,7 +39,7 @@ public class PaymentController {
      */
     @PostMapping("/send")
     public ResponseEntity<PaymentResponse> sendMoney(
-            @RequestBody PaymentRequest paymentRequest,
+            @Valid @RequestBody PaymentRequest paymentRequest,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         log.info("POST /api/payments/send - Initiating payment from account: {}",
                 paymentRequest.getSenderAccountNumber());
