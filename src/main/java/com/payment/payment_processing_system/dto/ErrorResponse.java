@@ -1,5 +1,6 @@
 package com.payment.payment_processing_system.dto;
 
+import com.payment.payment_processing_system.enums.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,10 +29,12 @@ public class ErrorResponse {
     /** The HTTP status reason phrase (e.g. "Not Found", "Bad Request"). */
     private String error;
 
+    /** Machine-readable error code for programmatic handling by clients. */
+    private ErrorCode errorCode;
+
     /** A human-readable description of what went wrong. */
     private String message;
 
     /** The request URI path that triggered the error. */
     private String path;
 }
-

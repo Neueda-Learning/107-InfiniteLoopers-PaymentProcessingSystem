@@ -1,19 +1,20 @@
 package com.payment.payment_processing_system.exception;
 
 import com.payment.payment_processing_system.dto.ErrorResponse;
+import com.payment.payment_processing_system.enums.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 /**
  * Global exception handler for the Payment Processing System.
- * Intercepts all exceptions thrown from controllers and returns
- * a structured {@link ErrorResponse} JSON body.
  */
 @Slf4j
 @RestControllerAdvice
@@ -25,37 +26,52 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCustomerNotFoundException(
             CustomerNotFoundException ex, HttpServletRequest request) {
         log.error("Customer not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ErrorCode.CUSTOMER_NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAccountNotFoundException(
             AccountNotFoundException ex, HttpServletRequest request) {
         log.error("Account not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ErrorCode.ACCOUNT_NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(TransactionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleTransactionNotFoundException(
             TransactionNotFoundException ex, HttpServletRequest request) {
         log.error("Transaction not found: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ErrorCode.PAYMENT_NOT_FOUND, ex.getMessage(), request);
     }
 
     // ─── 400 Bad Request ──────────────────────────────────────────────────────
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String fieldErrors = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        log.error("Bean validation failed: {}", fieldErrors);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, fieldErrors, request);
+    }
 
     @ExceptionHandler(InvalidPaymentException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPaymentException(
             InvalidPaymentException ex, HttpServletRequest request) {
         log.error("Invalid payment request: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        // Distinguish transition errors from general validation errors for correct error code
+        ErrorCode code = ex.getMessage() != null && ex.getMessage().contains("Invalid status transition")
+                ? ErrorCode.INVALID_STATUS_TRANSITION
+                : ErrorCode.VALIDATION_FAILED;
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, code, ex.getMessage(), request);
     }
 
     @ExceptionHandler(PaymentValidationException.class)
     public ResponseEntity<ErrorResponse> handlePaymentValidationException(
             PaymentValidationException ex, HttpServletRequest request) {
         log.error("Payment validation failed: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, ex.getMessage(), request);
     }
 
     // ─── 401 Unauthorized ─────────────────────────────────────────────────────
@@ -64,7 +80,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidUpiPinException(
             InvalidUpiPinException ex, HttpServletRequest request) {
         log.error("Invalid UPI PIN: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_UPI_PIN, ex.getMessage(), request);
     }
 
     // ─── 409 Conflict ─────────────────────────────────────────────────────────
@@ -73,7 +89,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDuplicatePaymentException(
             DuplicatePaymentException ex, HttpServletRequest request) {
         log.error("Duplicate payment detected: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.CONFLICT, ErrorCode.DUPLICATE_PAYMENT, ex.getMessage(), request);
     }
 
     // ─── 422 Unprocessable Entity ─────────────────────────────────────────────
@@ -82,7 +98,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInsufficientBalanceException(
             InsufficientBalanceException ex, HttpServletRequest request) {
         log.error("Insufficient balance: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.INSUFFICIENT_FUNDS, ex.getMessage(), request);
     }
 
     // ─── 429 Too Many Requests ────────────────────────────────────────────────
@@ -91,14 +107,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRetryLimitExceededException(
             RetryLimitExceededException ex, HttpServletRequest request) {
         log.error("Retry limit exceeded: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.RETRY_LIMIT_EXCEEDED, ex.getMessage(), request);
     }
 
     @ExceptionHandler(MaxRetryExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxRetryExceededException(
             MaxRetryExceededException ex, HttpServletRequest request) {
         log.error("Max retry limit exceeded: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.RETRY_LIMIT_EXCEEDED, ex.getMessage(), request);
     }
 
     // ─── 502 Bad Gateway ──────────────────────────────────────────────────────
@@ -107,7 +123,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePaymentFailedException(
             PaymentFailedException ex, HttpServletRequest request) {
         log.error("Payment processing failed: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.BAD_GATEWAY, ex.getMessage(), request);
+        return buildErrorResponse(HttpStatus.BAD_GATEWAY, ErrorCode.PAYMENT_FAILED, ex.getMessage(), request);
     }
 
     // ─── 500 Internal Server Error ────────────────────────────────────────────
@@ -116,19 +132,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
         log.error("Unexpected error at [{}]: {}", request.getRequestURI(), ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.PROCESSING_ERROR,
                 "An unexpected error occurred. Please try again later.", request);
     }
 
     // ─── Helper ───────────────────────────────────────────────────────────────
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(
-            HttpStatus status, String message, HttpServletRequest request) {
+            HttpStatus status, ErrorCode errorCode, String message, HttpServletRequest request) {
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
+                .errorCode(errorCode)
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
