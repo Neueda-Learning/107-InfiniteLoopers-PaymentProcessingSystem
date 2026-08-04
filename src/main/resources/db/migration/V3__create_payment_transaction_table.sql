@@ -1,0 +1,26 @@
+CREATE TABLE payment_transactions (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    transaction_id VARCHAR(50) NOT NULL,
+    sender_account_id BIGINT NOT NULL,
+    receiver_account_id BIGINT NOT NULL,
+    amount DECIMAL(19,4) NOT NULL,
+    description VARCHAR(500) NULL,
+    payment_status VARCHAR(20) NOT NULL,
+    idempotency_key VARCHAR(100) NOT NULL,
+    retry_count INT NOT NULL DEFAULT 0,
+    created_time DATETIME NOT NULL,
+    validated_time DATETIME NULL,
+    sent_time DATETIME NULL,
+    completed_time DATETIME NULL,
+    failed_time DATETIME NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT uq_payment_transactions_transaction_id UNIQUE (transaction_id),
+    CONSTRAINT uq_payment_transactions_idempotency_key UNIQUE (idempotency_key),
+    CONSTRAINT fk_payment_transactions_sender FOREIGN KEY (sender_account_id) REFERENCES accounts (id),
+    CONSTRAINT fk_payment_transactions_receiver FOREIGN KEY (receiver_account_id) REFERENCES accounts (id),
+    INDEX idx_transaction_id (transaction_id),
+    INDEX idx_idempotency_key (idempotency_key),
+    INDEX idx_payment_status (payment_status),
+    INDEX idx_created_time (created_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
