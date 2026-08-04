@@ -2,10 +2,12 @@ package com.payment.payment_processing_system.service.impl;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
 import com.payment.payment_processing_system.dto.PaymentResponse;
+import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.email.EmailService;
 import com.payment.payment_processing_system.enums.PaymentStatus;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
+import com.payment.payment_processing_system.exception.DuplicatePaymentException;
 import com.payment.payment_processing_system.exception.InsufficientBalanceException;
 import com.payment.payment_processing_system.exception.InvalidPaymentException;
 import com.payment.payment_processing_system.exception.InvalidUpiPinException;
@@ -26,11 +28,14 @@ import com.payment.payment_processing_system.validation.RetryValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.List;
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -44,6 +49,8 @@ import java.util.stream.Collectors;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final BigDecimal HIGH_VALUE_THRESHOLD = new BigDecimal("10000");
+    private static final int MAX_IDEMPOTENCY_KEY_GENERATION_ATTEMPTS = 5;
+    private static final String IDEMPOTENCY_KEY_PATTERN = "[A-Za-z0-9_-]{8,100}";
 
     private final AccountRepository accountRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
@@ -62,11 +69,28 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponse sendMoney(PaymentRequest request) {
+        return sendMoney(request, null);
+    }
+
+    /**
+     * Processes a payment transaction, optionally using a client-supplied
+     * idempotency key for safe retries.
+     */
+    @Override
+    @Transactional
+    public PaymentResponse sendMoney(PaymentRequest request, String idempotencyKey) {
         PaymentTransaction transaction = null;
 
         try {
             // Step 0: Validate request fields (no DB access)
             paymentValidator.validate(request);
+
+            // Step 0.1: Resolve idempotency behavior before touching balances.
+            String resolvedIdempotencyKey = resolveIdempotencyKey(idempotencyKey);
+            PaymentResponse replayResponse = tryHandleIdempotentReplay(request, resolvedIdempotencyKey);
+            if (replayResponse != null) {
+                return replayResponse;
+            }
 
             // Step 1: Fetch and validate sender account
             Account senderAccount = accountRepository.findByAccountNumber(request.getSenderAccountNumber())
@@ -88,9 +112,8 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new InvalidUpiPinException("Invalid UPI PIN. Authentication failed.");
             }
 
-            // Step 7 & 8: Generate unique transactionId and idempotencyKey
+            // Step 7 & 8: Generate unique transactionId and persist the resolved idempotency key
             String transactionId = generateTransactionId();
-            String idempotencyKey = generateIdempotencyKey();
 
             // Step 9: Create PaymentTransaction with status CREATED
             transaction = PaymentTransaction.builder()
@@ -100,12 +123,21 @@ public class PaymentServiceImpl implements PaymentService {
                     .amount(request.getAmount())
                     .description(request.getDescription())
                     .paymentStatus(PaymentStatus.CREATED)
-                    .idempotencyKey(idempotencyKey)
+                    .idempotencyKey(resolvedIdempotencyKey)
                     .retryCount(0)
                     .createdTime(LocalDateTime.now())
                     .build();
 
-            transaction = paymentTransactionRepository.save(transaction);
+            try {
+                transaction = paymentTransactionRepository.save(transaction);
+            } catch (DataIntegrityViolationException ex) {
+                PaymentResponse raceReplay = handleIdempotencyRace(request, resolvedIdempotencyKey, ex);
+                if (raceReplay != null) {
+                    return raceReplay;
+                }
+                throw new DuplicatePaymentException(
+                        "Duplicate payment detected due to idempotency key conflict.", ex);
+            }
             recordStatusHistory(transaction, PaymentStatus.CREATED);
             log.info("Transaction created: {}", transactionId);
 
@@ -150,9 +182,13 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
 
-            return buildPaymentResponse(transaction, "Payment completed successfully.");
+            return buildPaymentResponse(transaction, "Payment completed successfully.", false);
 
         // ── BUG FIX: catch ALL validator exceptions explicitly for proper logging ──
+        } catch (DuplicatePaymentException ex) {
+            log.error("Duplicate payment blocked: {}", ex.getMessage());
+            throw ex;
+
         } catch (AccountNotFoundException
                 | InvalidPaymentException
                 | InvalidUpiPinException
@@ -230,6 +266,40 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
+     * Retrieve all payment transactions filtered by status.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TransactionResponse> getTransactionsByStatus(PaymentStatus paymentStatus) {
+        return paymentTransactionRepository.findByPaymentStatus(paymentStatus)
+                .stream()
+                .sorted(Comparator.comparing(PaymentTransaction::getCreatedTime).reversed())
+                .map(transactionMapper::toTransactionResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieve status history for a transaction in chronological order.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<TransactionStatusHistoryResponse> getTransactionHistory(String transactionId) {
+        paymentTransactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException(
+                        "Transaction not found with ID: " + transactionId));
+
+        return transactionStatusHistoryRepository.findByTransactionTransactionId(transactionId)
+                .stream()
+                .sorted(Comparator.comparing(TransactionStatusHistory::getTimestamp))
+                .map(history -> TransactionStatusHistoryResponse.builder()
+                        .transactionId(history.getTransaction().getTransactionId())
+                        .status(history.getStatus().name())
+                        .timestamp(history.getTimestamp())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Generate a unique transaction ID using UUID.
      */
     @Override
@@ -243,6 +313,106 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public String generateIdempotencyKey() {
         return "IDEM-" + UUID.randomUUID().toString().replace("-", "").toUpperCase();
+    }
+
+    /**
+     * Generate a unique and format-valid idempotency key.
+     */
+    private String generateUniqueIdempotencyKey() {
+        for (int attempt = 1; attempt <= MAX_IDEMPOTENCY_KEY_GENERATION_ATTEMPTS; attempt++) {
+            String generatedKey = generateIdempotencyKey();
+
+            if (!generatedKey.matches(IDEMPOTENCY_KEY_PATTERN)) {
+                log.warn("Generated idempotency key failed format validation on attempt {}", attempt);
+                continue;
+            }
+
+            if (!paymentTransactionRepository.existsByIdempotencyKey(generatedKey)) {
+                return generatedKey;
+            }
+
+            log.warn("Generated idempotency key collision detected on attempt {}", attempt);
+        }
+
+        throw new DuplicatePaymentException(
+                "Unable to generate a unique idempotency key. Please retry the payment.");
+    }
+
+    /**
+     * Normalize and validate an incoming idempotency key, or generate one for legacy clients.
+     */
+    private String resolveIdempotencyKey(String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            return generateUniqueIdempotencyKey();
+        }
+
+        String normalizedKey = idempotencyKey.trim();
+        if (!normalizedKey.matches(IDEMPOTENCY_KEY_PATTERN)) {
+            throw new InvalidPaymentException(
+                    "Idempotency key must be 8-100 characters and contain only letters, digits, underscores, or hyphens.");
+        }
+
+        return normalizedKey;
+    }
+
+    /**
+     * Return the original payment when the same idempotency key is replayed with the same payload.
+     */
+    private PaymentResponse tryHandleIdempotentReplay(PaymentRequest request, String idempotencyKey) {
+        return paymentTransactionRepository.findByIdempotencyKey(idempotencyKey)
+                .map(existingTransaction -> {
+                    validateIdempotentRequestMatches(request, existingTransaction);
+                    log.info("Returning existing transaction {} for idempotency key {}",
+                            existingTransaction.getTransactionId(), idempotencyKey);
+                    return buildPaymentResponse(
+                            existingTransaction,
+                            "Duplicate payment request detected. Returning existing transaction.",
+                            true);
+                })
+                .orElse(null);
+    }
+
+    /**
+     * Handle DB-level unique races by replaying the existing transaction when safe.
+     */
+    private PaymentResponse handleIdempotencyRace(
+            PaymentRequest request,
+            String idempotencyKey,
+            DataIntegrityViolationException ex) {
+
+        return paymentTransactionRepository.findByIdempotencyKey(idempotencyKey)
+                .map(existingTransaction -> {
+                    validateIdempotentRequestMatches(request, existingTransaction);
+                    log.info("Resolved concurrent idempotent request using existing transaction {}",
+                            existingTransaction.getTransactionId());
+                    return buildPaymentResponse(
+                            existingTransaction,
+                            "Duplicate payment request detected. Returning existing transaction.",
+                            true);
+                })
+                .orElseThrow(() -> new DuplicatePaymentException(
+                        "Duplicate payment detected due to idempotency key conflict.", ex));
+    }
+
+    /**
+     * Ensure a reused idempotency key is not paired with a different payment payload.
+     */
+    private void validateIdempotentRequestMatches(PaymentRequest request, PaymentTransaction existingTransaction) {
+        boolean sameRequest = Objects.equals(request.getSenderAccountNumber(), existingTransaction.getSenderAccount().getAccountNumber())
+                && Objects.equals(request.getReceiverAccountNumber(), existingTransaction.getReceiverAccount().getAccountNumber())
+                && Objects.equals(request.getReceiverIfscCode(), existingTransaction.getReceiverAccount().getIfscCode())
+                && request.getAmount() != null
+                && request.getAmount().compareTo(existingTransaction.getAmount()) == 0
+                && Objects.equals(normalizeDescription(request.getDescription()), normalizeDescription(existingTransaction.getDescription()));
+
+        if (!sameRequest) {
+            throw new DuplicatePaymentException(
+                    "The provided idempotency key has already been used for a different payment request.");
+        }
+    }
+
+    private String normalizeDescription(String description) {
+        return description == null ? null : description.trim();
     }
 
     // ─── Private helper methods ────────────────────────────────────────────────
@@ -276,11 +446,12 @@ public class PaymentServiceImpl implements PaymentService {
     /**
      * Builds a PaymentResponse from a completed or failed transaction.
      */
-    private PaymentResponse buildPaymentResponse(PaymentTransaction transaction, String message) {
+    private PaymentResponse buildPaymentResponse(PaymentTransaction transaction, String message, boolean idempotentReplay) {
         return PaymentResponse.builder()
                 .transactionId(transaction.getTransactionId())
                 .paymentStatus(transaction.getPaymentStatus().name())
                 .message(message)
+                .idempotentReplay(idempotentReplay)
                 .amount(transaction.getAmount())
                 .senderAccountNumber(transaction.getSenderAccount().getAccountNumber())
                 .receiverAccountNumber(transaction.getReceiverAccount().getAccountNumber())

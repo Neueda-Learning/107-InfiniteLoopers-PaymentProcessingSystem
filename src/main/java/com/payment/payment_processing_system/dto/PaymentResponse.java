@@ -17,6 +17,7 @@ public class PaymentResponse {
     private String transactionId;
     private String paymentStatus;
     private String message;
+    private boolean idempotentReplay;
     private BigDecimal amount;
     private String senderAccountNumber;
     private String receiverAccountNumber;
