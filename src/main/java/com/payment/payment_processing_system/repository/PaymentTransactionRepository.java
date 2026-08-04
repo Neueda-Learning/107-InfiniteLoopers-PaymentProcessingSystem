@@ -35,6 +35,14 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
     Optional<PaymentTransaction> findByIdempotencyKey(String idempotencyKey);
 
     /**
+     * Check whether an idempotency key already exists.
+     *
+     * @param idempotencyKey the idempotency key to check
+     * @return true if present, false otherwise
+     */
+    boolean existsByIdempotencyKey(String idempotencyKey);
+
+    /**
      * Find all payment transactions sent from a specific account.
      *
      * @param accountNumber the account number of the sender
