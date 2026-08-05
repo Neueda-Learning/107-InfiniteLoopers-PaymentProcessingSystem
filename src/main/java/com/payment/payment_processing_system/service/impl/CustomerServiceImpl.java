@@ -1,10 +1,13 @@
 package com.payment.payment_processing_system.service.impl;
 
+import com.payment.payment_processing_system.dto.CustomerAccountResponse;
+import com.payment.payment_processing_system.dto.CustomerListItemResponse;
 import com.payment.payment_processing_system.dto.CustomerResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
 import com.payment.payment_processing_system.exception.CustomerNotFoundException;
 import com.payment.payment_processing_system.exception.TransactionNotFoundException;
+import com.payment.payment_processing_system.mapper.AccountMapper;
 import com.payment.payment_processing_system.mapper.CustomerMapper;
 import com.payment.payment_processing_system.mapper.TransactionMapper;
 import com.payment.payment_processing_system.model.Account;
@@ -34,22 +37,66 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
+    private final AccountMapper accountMapper;
     private final CustomerMapper customerMapper;
     private final TransactionMapper transactionMapper;
 
     @Override
-    public List<CustomerResponse> getAllCustomers() {
+    public List<CustomerListItemResponse> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
 
         return customers.stream()
-                .map(customer -> {
-                    // Fetch the first account associated with the customer (if any)
-                    List<Account> accounts = customer.getAccounts() != null ? 
-                        new ArrayList<>(customer.getAccounts()) : new ArrayList<>();
-                    Account firstAccount = accounts.isEmpty() ? null : accounts.get(0);
-                    return customerMapper.toCustomerResponse(customer, firstAccount);
-                })
+                .map(customer -> new CustomerListItemResponse(customer.getId(), customer.getCustomerName()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CustomerAccountResponse> getActiveAccountsByCustomerId(Long customerId) {
+        if (customerId == null || customerId <= 0) {
+            throw new IllegalArgumentException("Customer ID must be a positive number");
+        }
+
+        if (!customerRepository.existsById(customerId)) {
+            throw new CustomerNotFoundException("Customer not found with ID: " + customerId);
+        }
+
+        return accountRepository.findByCustomerIdAndActiveTrueOrderByBankNameAscIdAsc(customerId)
+                .stream()
+                .map(accountMapper::toCustomerAccountResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CustomerAccountResponse> getActiveAccountsByCustomerIdentifier(String customerName, String email, String phoneNumber) {
+        String normalizedName = normalize(customerName);
+        String normalizedEmail = normalize(email);
+        String normalizedPhone = normalize(phoneNumber);
+
+        int provided = countProvided(normalizedName, normalizedEmail, normalizedPhone);
+        if (provided == 0) {
+            throw new IllegalArgumentException("Provide at least one identifier: customerName, email, or phoneNumber");
+        }
+
+        Customer customer;
+        // Priority: email > phone > name (use first available)
+        if (normalizedEmail != null) {
+            customer = customerRepository.findByEmail(normalizedEmail)
+                    .orElseThrow(() -> new CustomerNotFoundException("Customer not found with email: " + normalizedEmail));
+        } else if (normalizedPhone != null) {
+            customer = customerRepository.findByPhoneNumber(normalizedPhone)
+                    .orElseThrow(() -> new CustomerNotFoundException("Customer not found with phone number: " + normalizedPhone));
+        } else {
+            List<Customer> matches = customerRepository.findByCustomerNameIgnoreCase(normalizedName);
+            if (matches.isEmpty()) {
+                throw new CustomerNotFoundException("Customer not found with name: " + normalizedName);
+            }
+            if (matches.size() > 1) {
+                throw new IllegalArgumentException("Multiple customers found for name. Use email or phoneNumber.");
+            }
+            customer = matches.get(0);
+        }
+
+        return getActiveAccountsByCustomerId(customer.getId());
     }
 
     @Override
@@ -78,7 +125,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<TransactionResponse> getTransactionHistory(String accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
+        accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException(
                         "Account not found with number: " + accountNumber));
 
@@ -108,6 +155,24 @@ public class CustomerServiceImpl implements CustomerService {
                         "Transaction not found with ID: " + transactionId));
 
         return transactionMapper.toTransactionResponse(transaction);
+    }
+
+    private String normalize(String value) {
+        return value == null || value.trim().isEmpty() ? null : value.trim();
+    }
+
+    private int countProvided(String customerName, String email, String phoneNumber) {
+        int count = 0;
+        if (customerName != null) {
+            count++;
+        }
+        if (email != null) {
+            count++;
+        }
+        if (phoneNumber != null) {
+            count++;
+        }
+        return count;
     }
 }
 

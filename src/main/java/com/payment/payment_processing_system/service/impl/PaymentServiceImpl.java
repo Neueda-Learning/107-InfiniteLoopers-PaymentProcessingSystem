@@ -7,6 +7,7 @@ import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.email.EmailService;
 import com.payment.payment_processing_system.enums.PaymentStatus;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
+import com.payment.payment_processing_system.exception.DailyTransactionLimitExceededException;
 import com.payment.payment_processing_system.exception.DuplicatePaymentException;
 import com.payment.payment_processing_system.exception.InsufficientBalanceException;
 import com.payment.payment_processing_system.exception.InvalidPaymentException;
@@ -23,6 +24,7 @@ import com.payment.payment_processing_system.repository.TransactionStatusHistory
 import com.payment.payment_processing_system.service.PaymentService;
 import com.payment.payment_processing_system.validation.AccountValidator;
 import com.payment.payment_processing_system.validation.BalanceValidator;
+import com.payment.payment_processing_system.validation.DailyTransactionLimitValidator;
 import com.payment.payment_processing_system.validation.PaymentValidator;
 import com.payment.payment_processing_system.validation.RetryValidator;
 import com.payment.payment_processing_system.validation.StatusTransitionValidator;
@@ -198,6 +200,7 @@ public class PaymentServiceImpl implements PaymentService {
                 | InvalidPaymentException
                 | InvalidUpiPinException
                 | InsufficientBalanceException
+                | DailyTransactionLimitExceededException
                 | RetryLimitExceededException ex) {
             log.error("Payment failed during validation [{}]: {}", ex.getClass().getSimpleName(), ex.getMessage());
             if (transaction != null) {

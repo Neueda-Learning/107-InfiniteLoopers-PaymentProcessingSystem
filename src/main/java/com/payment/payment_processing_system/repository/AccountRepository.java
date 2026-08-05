@@ -4,6 +4,7 @@ import com.payment.payment_processing_system.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,5 +21,13 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * @return an Optional containing the Account if found, empty otherwise
      */
     Optional<Account> findByAccountNumber(String accountNumber);
+
+    /**
+     * Find all active accounts for a specific customer.
+     *
+     * @param customerId customer ID
+     * @return list of active accounts
+     */
+    List<Account> findByCustomerIdAndActiveTrueOrderByBankNameAscIdAsc(Long customerId);
 }
 

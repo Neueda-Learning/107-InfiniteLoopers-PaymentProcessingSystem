@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,5 +107,22 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
      */
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM PaymentTransaction t WHERE t.paymentStatus = :paymentStatus")
     BigDecimal sumAmountByStatus(PaymentStatus paymentStatus);
+
+    /**
+     * Find all COMPLETED transactions from a sender account within a specific date-time range.
+     * Used for daily transaction limit validation.
+     *
+     * @param senderAccountId the ID of the sender account
+     * @param startDateTime   the start of the date-time range (inclusive)
+     * @param endDateTime     the end of the date-time range (inclusive)
+     * @return a List of COMPLETED PaymentTransaction records
+     */
+    @Query("SELECT t FROM PaymentTransaction t " +
+           "WHERE t.senderAccount.id = :senderAccountId " +
+           "AND t.paymentStatus = 'COMPLETED' " +
+           "AND t.completedTime >= :startDateTime " +
+           "AND t.completedTime <= :endDateTime")
+    List<PaymentTransaction> findCompletedTransactionsBySenderAccountOnDate(
+            Long senderAccountId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
 
