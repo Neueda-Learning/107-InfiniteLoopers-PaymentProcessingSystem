@@ -30,6 +30,13 @@
 
 ---
 
+### 3. Payment > 10000
+- Provide a pop up where customer should get an alert.
+- Show a "Cancel Payment" option during this period.
+- Update transaction status accordingly if cancelled.
+
+---
+
 ### 4. Duplicate Payment Detection
 - Detect repeated payments with:
   - Same sender
