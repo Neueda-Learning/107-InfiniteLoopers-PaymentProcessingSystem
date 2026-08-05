@@ -1,5 +1,6 @@
 package com.payment.payment_processing_system.dto;
 
+import com.payment.payment_processing_system.enums.CurrencyType;
 import lombok.*;
 import java.math.BigDecimal;
 
@@ -21,5 +22,6 @@ public class CustomerResponse {
     private String ifscCode;
     private String bankName;
     private BigDecimal balance;
+    private CurrencyType currency;
 }
 

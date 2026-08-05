@@ -2,6 +2,8 @@ package com.payment.payment_processing_system.service.impl;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
 import com.payment.payment_processing_system.dto.PaymentResponse;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentResponse;
 import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.email.EmailService;
@@ -21,10 +23,10 @@ import com.payment.payment_processing_system.model.TransactionStatusHistory;
 import com.payment.payment_processing_system.repository.AccountRepository;
 import com.payment.payment_processing_system.repository.PaymentTransactionRepository;
 import com.payment.payment_processing_system.repository.TransactionStatusHistoryRepository;
+import com.payment.payment_processing_system.service.CurrencyConversionService;
 import com.payment.payment_processing_system.service.PaymentService;
 import com.payment.payment_processing_system.validation.AccountValidator;
 import com.payment.payment_processing_system.validation.BalanceValidator;
-import com.payment.payment_processing_system.validation.DailyTransactionLimitValidator;
 import com.payment.payment_processing_system.validation.PaymentValidator;
 import com.payment.payment_processing_system.validation.RetryValidator;
 import com.payment.payment_processing_system.validation.StatusTransitionValidator;
@@ -63,6 +65,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentValidator paymentValidator;
     private final AccountValidator accountValidator;
     private final BalanceValidator balanceValidator;
+    private final CurrencyConversionService currencyConversionService;
     private final RetryValidator retryValidator;
     private final StatusTransitionValidator statusTransitionValidator;
 
@@ -108,8 +111,28 @@ public class PaymentServiceImpl implements PaymentService {
                             "Receiver account not found: " + request.getReceiverAccountNumber()));
             accountValidator.validateReceiverAccount(receiverAccount);
 
+            validateAccountCurrency(senderAccount, "sender");
+            validateAccountCurrency(receiverAccount, "receiver");
+
+            // Step 3: Determine conversion and transfer charge (read-only calculation)
+            boolean conversionRequired = senderAccount.getCurrency() != receiverAccount.getCurrency();
+            BigDecimal exchangeRate = BigDecimal.ONE;
+            BigDecimal convertedAmount = request.getAmount();
+            BigDecimal transferCharge = BigDecimal.ZERO;
+
+            if (conversionRequired) {
+                exchangeRate = currencyConversionService.getExchangeRate(
+                        senderAccount.getCurrency(), receiverAccount.getCurrency());
+                convertedAmount = currencyConversionService.convertAmount(
+                        request.getAmount(), senderAccount.getCurrency(), receiverAccount.getCurrency());
+                transferCharge = currencyConversionService.calculateTransferCharge(
+                        request.getAmount(), senderAccount.getCurrency(), receiverAccount.getCurrency());
+            }
+
+            BigDecimal totalDeducted = request.getAmount().add(transferCharge);
+
             // Step 5: Validate sender balance (requires DB data)
-            balanceValidator.validateBalance(senderAccount, request.getAmount());
+            balanceValidator.validateBalance(senderAccount, totalDeducted);
 
             // Step 6: Validate UPI PIN against stored value (requires DB data)
             if (!senderAccount.getUpiPin().equals(request.getUpiPin())) {
@@ -125,6 +148,11 @@ public class PaymentServiceImpl implements PaymentService {
                     .senderAccount(senderAccount)
                     .receiverAccount(receiverAccount)
                     .amount(request.getAmount())
+                    .senderCurrency(senderAccount.getCurrency())
+                    .receiverCurrency(receiverAccount.getCurrency())
+                    .exchangeRate(exchangeRate)
+                    .transferCharge(transferCharge)
+                    .convertedAmount(convertedAmount)
                     .description(request.getDescription())
                     .paymentStatus(PaymentStatus.CREATED)
                     .idempotencyKey(resolvedIdempotencyKey)
@@ -154,8 +182,8 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("Transaction validated: {}", transactionId);
 
             // Step 11: Deduct sender balance and credit receiver balance
-            senderAccount.setBalance(senderAccount.getBalance().subtract(request.getAmount()));
-            receiverAccount.setBalance(receiverAccount.getBalance().add(request.getAmount()));
+            senderAccount.setBalance(senderAccount.getBalance().subtract(totalDeducted));
+            receiverAccount.setBalance(receiverAccount.getBalance().add(convertedAmount));
             accountRepository.save(senderAccount);
             accountRepository.save(receiverAccount);
 
@@ -215,6 +243,33 @@ public class PaymentServiceImpl implements PaymentService {
             }
             throw ex;
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PreviewPaymentResponse previewPayment(PreviewPaymentRequest request) {
+        validatePreviewRequest(request);
+
+        Account senderAccount = getValidatedSenderAccount(request.getSenderAccountNumber());
+        Account receiverAccount = getValidatedReceiverAccount(request.getReceiverAccountNumber());
+
+        BigDecimal exchangeRate = currencyConversionService
+                .getExchangeRate(senderAccount.getCurrency(), receiverAccount.getCurrency());
+        BigDecimal convertedAmount = currencyConversionService
+                .convertAmount(request.getAmount(), senderAccount.getCurrency(), receiverAccount.getCurrency());
+        BigDecimal transferCharge = currencyConversionService
+                .calculateTransferCharge(request.getAmount(), senderAccount.getCurrency(), receiverAccount.getCurrency());
+
+        return PreviewPaymentResponse.builder()
+                .senderCurrency(senderAccount.getCurrency())
+                .receiverCurrency(receiverAccount.getCurrency())
+                .exchangeRate(exchangeRate)
+                .originalAmount(request.getAmount())
+                .convertedAmount(convertedAmount)
+                .transferCharge(transferCharge)
+                .totalDeducted(request.getAmount().add(transferCharge))
+                .conversionRequired(senderAccount.getCurrency() != receiverAccount.getCurrency())
+                .build();
     }
 
     /**
@@ -423,6 +478,49 @@ public class PaymentServiceImpl implements PaymentService {
         return description == null ? null : description.trim();
     }
 
+    private void validateAccountCurrency(Account account, String role) {
+        if (account.getCurrency() == null) {
+            throw new InvalidPaymentException("Currency is not configured for " + role + " account: "
+                    + account.getAccountNumber());
+        }
+    }
+
+    private void validatePreviewRequest(PreviewPaymentRequest request) {
+        if (request == null) {
+            throw new InvalidPaymentException("Preview payment request must not be null.");
+        }
+        if (request.getSenderAccountNumber() == null || request.getSenderAccountNumber().isBlank()) {
+            throw new InvalidPaymentException("Sender account number must not be empty.");
+        }
+        if (request.getReceiverAccountNumber() == null || request.getReceiverAccountNumber().isBlank()) {
+            throw new InvalidPaymentException("Receiver account number must not be empty.");
+        }
+        if (request.getSenderAccountNumber().equalsIgnoreCase(request.getReceiverAccountNumber())) {
+            throw new InvalidPaymentException("Sender and receiver account numbers cannot be the same.");
+        }
+        if (request.getAmount() == null) {
+            throw new InvalidPaymentException("Transaction amount must not be null.");
+        }
+        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidPaymentException(
+                    "Transaction amount must be greater than zero. Provided: " + request.getAmount().toPlainString());
+        }
+    }
+
+    private Account getValidatedSenderAccount(String senderAccountNumber) {
+        Account senderAccount = accountRepository.findByAccountNumber(senderAccountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("Sender account not found: " + senderAccountNumber));
+        accountValidator.validateSenderAccount(senderAccount);
+        return senderAccount;
+    }
+
+    private Account getValidatedReceiverAccount(String receiverAccountNumber) {
+        Account receiverAccount = accountRepository.findByAccountNumber(receiverAccountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("Receiver account not found: " + receiverAccountNumber));
+        accountValidator.validateReceiverAccount(receiverAccount);
+        return receiverAccount;
+    }
+
     // ─── Private helper methods ────────────────────────────────────────────────
 
     /**
@@ -457,6 +555,12 @@ public class PaymentServiceImpl implements PaymentService {
      * Builds a PaymentResponse from a completed or failed transaction.
      */
     private PaymentResponse buildPaymentResponse(PaymentTransaction transaction, String message, boolean idempotentReplay) {
+        BigDecimal transferCharge = transaction.getTransferCharge() != null ? transaction.getTransferCharge() : BigDecimal.ZERO;
+        BigDecimal convertedAmount = transaction.getConvertedAmount() != null ? transaction.getConvertedAmount() : transaction.getAmount();
+        boolean conversionRequired = transaction.getSenderCurrency() != null
+                && transaction.getReceiverCurrency() != null
+                && transaction.getSenderCurrency() != transaction.getReceiverCurrency();
+
         return PaymentResponse.builder()
                 .transactionId(transaction.getTransactionId())
                 .paymentStatus(transaction.getPaymentStatus().name())
@@ -465,6 +569,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(transaction.getAmount())
                 .senderAccountNumber(transaction.getSenderAccount().getAccountNumber())
                 .receiverAccountNumber(transaction.getReceiverAccount().getAccountNumber())
+                .senderCurrency(transaction.getSenderCurrency())
+                .receiverCurrency(transaction.getReceiverCurrency())
+                .exchangeRate(transaction.getExchangeRate())
+                .transferCharge(transferCharge)
+                .convertedAmount(convertedAmount)
+                .totalDeducted(transaction.getAmount().add(transferCharge))
+                .conversionRequired(conversionRequired)
                 .transactionTime(transaction.getCompletedTime() != null
                         ? transaction.getCompletedTime()
                         : transaction.getCreatedTime())

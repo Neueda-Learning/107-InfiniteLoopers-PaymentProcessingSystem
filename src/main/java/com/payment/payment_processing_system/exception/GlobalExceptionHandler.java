@@ -102,6 +102,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(UnsupportedExchangeRateException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedExchangeRateException(
+            UnsupportedExchangeRateException ex, HttpServletRequest request) {
+        log.error("Unsupported exchange rate: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.UNSUPPORTED_EXCHANGE_RATE, ex.getMessage(), request);
+    }
+
     // ─── 401 Unauthorized ─────────────────────────────────────────────────────
 
     @ExceptionHandler(InvalidUpiPinException.class)

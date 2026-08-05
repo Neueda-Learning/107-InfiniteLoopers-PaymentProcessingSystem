@@ -2,7 +2,7 @@ package com.payment.payment_processing_system.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.payment.payment_processing_system.enums.Currency;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -40,9 +40,9 @@ public class Account {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
-    @Column(name = "currency", nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
-    private Currency currency = Currency.INR;
+    private CurrencyType currency = CurrencyType.INR;
 
     @Column(name = "daily_transaction_limit", nullable = false)
     private BigDecimal dailyTransactionLimit = new BigDecimal("100000.00");

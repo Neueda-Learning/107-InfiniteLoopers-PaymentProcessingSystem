@@ -31,6 +31,7 @@ public class CustomerMapper {
             response.setIfscCode(account.getIfscCode());
             response.setBankName(account.getBankName());
             response.setBalance(account.getBalance());
+            response.setCurrency(account.getCurrency());
         }
 
         return response;

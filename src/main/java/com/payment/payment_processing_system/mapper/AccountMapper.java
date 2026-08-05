@@ -24,6 +24,7 @@ public class AccountMapper {
                 account.getBankName(),
                 account.getIfscCode(),
                 account.getBalance(),
+                account.getCurrency(),
                 account.isActive()
         );
     }
@@ -42,7 +43,7 @@ public class AccountMapper {
                 .balance(account.getBalance())
                 .customerName(account.getCustomer() != null ? account.getCustomer().getCustomerName() : null)
                 .email(account.getCustomer() != null ? account.getCustomer().getEmail() : null)
-                .currency(null)
+                .currency(account.getCurrency())
                 .build();
     }
 }

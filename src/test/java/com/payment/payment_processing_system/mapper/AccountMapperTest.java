@@ -2,6 +2,7 @@ package com.payment.payment_processing_system.mapper;
 
 import com.payment.payment_processing_system.dto.AccountResponse;
 import com.payment.payment_processing_system.dto.CustomerAccountResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.model.Account;
 import com.payment.payment_processing_system.model.Customer;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ class AccountMapperTest {
         account.setIfscCode("SBIN0001234");
         account.setBalance(new BigDecimal("75000.00"));
         account.setActive(true);
+        account.setCurrency(CurrencyType.INR);
         account.setUpiPin("1234");
 
         CustomerAccountResponse response = accountMapper.toCustomerAccountResponse(account);
@@ -37,6 +39,7 @@ class AccountMapperTest {
         assertEquals("State Bank of India", response.bankName());
         assertEquals("SBIN0001234", response.ifscCode());
         assertEquals(new BigDecimal("75000.00"), response.balance());
+        assertEquals(CurrencyType.INR, response.currency());
         assertTrue(response.isActive());
     }
 
@@ -53,6 +56,7 @@ class AccountMapperTest {
         account.setBankName("HDFC Bank");
         account.setIfscCode("HDFC0005678");
         account.setBalance(new BigDecimal("15000.00"));
+        account.setCurrency(CurrencyType.USD);
         account.setCustomer(customer);
         account.setUpiPin("1234");
 
@@ -65,7 +69,7 @@ class AccountMapperTest {
         assertEquals(new BigDecimal("15000.00"), response.getBalance());
         assertEquals("Alice Johnson", response.getCustomerName());
         assertEquals("alice.johnson@example.com", response.getEmail());
-        assertEquals(null, response.getCurrency());
+        assertEquals(CurrencyType.USD, response.getCurrency());
     }
 }
 

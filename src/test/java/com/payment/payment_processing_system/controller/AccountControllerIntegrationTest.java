@@ -3,6 +3,7 @@ package com.payment.payment_processing_system.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.payment_processing_system.dto.AccountResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
 import com.payment.payment_processing_system.service.AccountService;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +43,7 @@ class AccountControllerIntegrationTest {
                 .balance(new BigDecimal("50000.00"))
                 .customerName("Alice")
                 .email("alice@example.com")
-                .currency(null)
+                .currency(CurrencyType.INR)
                 .build();
 
         when(accountService.getAccountById(1L)).thenReturn(response);
@@ -55,7 +56,7 @@ class AccountControllerIntegrationTest {
         assertThat(body.path("customerName").asText()).isEqualTo("Alice");
         assertThat(body.path("email").asText()).isEqualTo("alice@example.com");
         assertThat(body.path("upiPin").isMissingNode() || body.path("upiPin").isNull()).isTrue();
-        assertThat(body.path("currency").isNull()).isTrue();
+        assertThat(body.path("currency").asText()).isEqualTo("INR");
     }
 
     @Test

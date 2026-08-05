@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.payment_processing_system.dto.PaymentRequest;
 import com.payment.payment_processing_system.dto.PaymentResponse;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.exception.RetryLimitExceededException;
 import com.payment.payment_processing_system.exception.TransactionNotFoundException;
 import com.payment.payment_processing_system.service.PaymentService;
@@ -20,8 +23,6 @@ import java.net.http.HttpResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,28 +53,38 @@ class PaymentControllerIntegrationTest {
                 .amount(new BigDecimal("10.00"))
                 .senderAccountNumber("100000000001")
                 .receiverAccountNumber("100000000002")
+                .senderCurrency(CurrencyType.USD)
+                .receiverCurrency(CurrencyType.INR)
+                .exchangeRate(new BigDecimal("87"))
+                .transferCharge(new BigDecimal("0.2000"))
+                .convertedAmount(new BigDecimal("870.0000"))
+                .totalDeducted(new BigDecimal("10.2000"))
+                .conversionRequired(true)
                 .transactionTime(LocalDateTime.of(2026, 8, 5, 9, 30, 0))
                 .build();
 
-        when(paymentService.sendMoney(any(PaymentRequest.class), isNull())).thenReturn(response);
+        when(paymentService.sendMoney(any(PaymentRequest.class))).thenReturn(response);
 
         HttpResponse<String> httpResponse = postJson("/api/payments/send", objectMapper.writeValueAsString(request), null);
         JsonNode body = objectMapper.readTree(httpResponse.body());
 
         assertThat(httpResponse.statusCode()).isEqualTo(201);
         assertThat(body.path("transactionId").asText()).isEqualTo("TXN-NEW-100");
-        assertThat(body.path("idempotentReplay").asBoolean()).isFalse();
+        assertThat(body.path("conversionRequired").asBoolean()).isTrue();
+        assertThat(body.path("senderCurrency").asText()).isEqualTo("USD");
+        assertThat(body.path("receiverCurrency").asText()).isEqualTo("INR");
+        assertThat(body.path("transferCharge").decimalValue()).isEqualByComparingTo(new BigDecimal("0.2000"));
     }
 
     @Test
-    @DisplayName("POST /api/payments/send should return 200 for idempotent replay")
-    void sendMoney_whenIdempotentReplay_shouldReturnOk() throws Exception {
+    @DisplayName("POST /api/payments/send should still return 201 even if Idempotency-Key header is provided")
+    void sendMoney_whenHeaderProvided_shouldIgnoreHeaderAndReturnCreated() throws Exception {
         PaymentRequest request = validRequest();
 
         PaymentResponse response = PaymentResponse.builder()
                 .transactionId("TXN-NEW-100")
                 .paymentStatus("COMPLETED")
-                .message("Idempotent replay")
+                .message("Payment processed")
                 .idempotentReplay(true)
                 .amount(new BigDecimal("10.00"))
                 .senderAccountNumber("100000000001")
@@ -81,14 +92,14 @@ class PaymentControllerIntegrationTest {
                 .transactionTime(LocalDateTime.of(2026, 8, 5, 9, 30, 0))
                 .build();
 
-        when(paymentService.sendMoney(any(PaymentRequest.class), eq("IDEMP-001"))).thenReturn(response);
+        when(paymentService.sendMoney(any(PaymentRequest.class))).thenReturn(response);
 
         HttpResponse<String> httpResponse = postJson("/api/payments/send", objectMapper.writeValueAsString(request), "IDEMP-001");
         JsonNode body = objectMapper.readTree(httpResponse.body());
 
-        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(httpResponse.statusCode()).isEqualTo(201);
         assertThat(body.path("transactionId").asText()).isEqualTo("TXN-NEW-100");
-        assertThat(body.path("idempotentReplay").asBoolean()).isTrue();
+        assertThat(body.path("paymentStatus").asText()).isEqualTo("COMPLETED");
     }
 
     @Test
@@ -110,6 +121,65 @@ class PaymentControllerIntegrationTest {
         assertThat(httpResponse.statusCode()).isEqualTo(400);
         assertThat(body.path("errorCode").asText()).isEqualTo("VALIDATION_FAILED");
         assertThat(body.path("path").asText()).isEqualTo("/api/payments/send");
+    }
+
+    @Test
+    @DisplayName("POST /api/payments/preview should return preview details")
+    void previewPayment_whenValidRequest_shouldReturnPreview() throws Exception {
+        PreviewPaymentRequest request = PreviewPaymentRequest.builder()
+                .senderAccountNumber("100000000001")
+                .receiverAccountNumber("100000000002")
+                .amount(new BigDecimal("100.00"))
+                .build();
+
+        PreviewPaymentResponse response = PreviewPaymentResponse.builder()
+                .senderCurrency(CurrencyType.USD)
+                .receiverCurrency(CurrencyType.INR)
+                .exchangeRate(new BigDecimal("87"))
+                .originalAmount(new BigDecimal("100.00"))
+                .convertedAmount(new BigDecimal("8700.0000"))
+                .transferCharge(new BigDecimal("2.0000"))
+                .totalDeducted(new BigDecimal("102.0000"))
+                .conversionRequired(true)
+                .build();
+
+        when(paymentService.previewPayment(any(PreviewPaymentRequest.class))).thenReturn(response);
+
+        HttpResponse<String> httpResponse = postJson(
+                "/api/payments/preview",
+                objectMapper.writeValueAsString(request),
+                null
+        );
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(body.path("senderCurrency").asText()).isEqualTo("USD");
+        assertThat(body.path("receiverCurrency").asText()).isEqualTo("INR");
+        assertThat(body.path("exchangeRate").decimalValue()).isEqualByComparingTo(new BigDecimal("87"));
+        assertThat(body.path("originalAmount").decimalValue()).isEqualByComparingTo(new BigDecimal("100.00"));
+        assertThat(body.path("convertedAmount").decimalValue()).isEqualByComparingTo(new BigDecimal("8700.0000"));
+        assertThat(body.path("transferCharge").decimalValue()).isEqualByComparingTo(new BigDecimal("2.0000"));
+        assertThat(body.path("totalDeducted").decimalValue()).isEqualByComparingTo(new BigDecimal("102.0000"));
+        assertThat(body.path("conversionRequired").asBoolean()).isTrue();
+    }
+
+    @Test
+    @DisplayName("POST /api/payments/preview should return 400 when request is invalid")
+    void previewPayment_whenValidationFails_shouldReturnBadRequest() throws Exception {
+        String invalidPayload = """
+                {
+                  "senderAccountNumber": "",
+                  "receiverAccountNumber": "100000000002",
+                  "amount": 0
+                }
+                """;
+
+        HttpResponse<String> httpResponse = postJson("/api/payments/preview", invalidPayload, null);
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(400);
+        assertThat(body.path("errorCode").asText()).isEqualTo("VALIDATION_FAILED");
+        assertThat(body.path("path").asText()).isEqualTo("/api/payments/preview");
     }
 
     @Test

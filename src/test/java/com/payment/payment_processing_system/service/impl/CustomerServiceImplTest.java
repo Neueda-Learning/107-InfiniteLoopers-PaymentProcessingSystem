@@ -4,6 +4,7 @@ import com.payment.payment_processing_system.dto.CustomerAccountResponse;
 import com.payment.payment_processing_system.dto.CustomerListItemResponse;
 import com.payment.payment_processing_system.dto.CustomerResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
 import com.payment.payment_processing_system.exception.CustomerNotFoundException;
 import com.payment.payment_processing_system.exception.TransactionNotFoundException;
@@ -88,11 +89,13 @@ class CustomerServiceImplTest {
         active1.setId(10L);
         active1.setBalance(new BigDecimal("50000.0000"));
         active1.setActive(true);
+        active1.setCurrency(CurrencyType.INR);
 
         Account active2 = account("100000000002");
         active2.setId(11L);
         active2.setBalance(new BigDecimal("30000.0000"));
         active2.setActive(true);
+        active2.setCurrency(CurrencyType.USD);
 
         CustomerAccountResponse mapped1 = new CustomerAccountResponse(
                 10L,
@@ -100,6 +103,7 @@ class CustomerServiceImplTest {
                 "Axis Bank",
                 "HDFC0005678",
                 new BigDecimal("50000.0000"),
+                CurrencyType.INR,
                 true
         );
         CustomerAccountResponse mapped2 = new CustomerAccountResponse(
@@ -108,6 +112,7 @@ class CustomerServiceImplTest {
                 "HDFC Bank",
                 "HDFC0005678",
                 new BigDecimal("30000.0000"),
+                CurrencyType.USD,
                 true
         );
 
@@ -123,7 +128,9 @@ class CustomerServiceImplTest {
         assertEquals("100000000001", responses.get(0).accountNumber());
         assertTrue(responses.get(0).isActive());
         assertEquals("Axis Bank", responses.get(0).bankName());
+        assertEquals(CurrencyType.INR, responses.get(0).currency());
         assertEquals("HDFC Bank", responses.get(1).bankName());
+        assertEquals(CurrencyType.USD, responses.get(1).currency());
     }
 
     @Test
@@ -146,6 +153,7 @@ class CustomerServiceImplTest {
         active.setId(10L);
         active.setBalance(new BigDecimal("50000.0000"));
         active.setActive(true);
+        active.setCurrency(CurrencyType.GBP);
 
         CustomerAccountResponse mapped = new CustomerAccountResponse(
                 10L,
@@ -153,6 +161,7 @@ class CustomerServiceImplTest {
                 "HDFC Bank",
                 "HDFC0005678",
                 new BigDecimal("50000.0000"),
+                CurrencyType.GBP,
                 true
         );
 
@@ -166,6 +175,7 @@ class CustomerServiceImplTest {
 
         assertEquals(1, responses.size());
         assertEquals(10L, responses.get(0).accountId());
+        assertEquals(CurrencyType.GBP, responses.get(0).currency());
     }
 
     @Test
@@ -186,6 +196,7 @@ class CustomerServiceImplTest {
         active.setId(10L);
         active.setBalance(new BigDecimal("50000.0000"));
         active.setActive(true);
+        active.setCurrency(CurrencyType.INR);
 
         CustomerAccountResponse mapped = new CustomerAccountResponse(
                 10L,
@@ -193,6 +204,7 @@ class CustomerServiceImplTest {
                 "HDFC Bank",
                 "HDFC0005678",
                 new BigDecimal("50000.0000"),
+                CurrencyType.INR,
                 true
         );
 
@@ -206,6 +218,7 @@ class CustomerServiceImplTest {
 
         assertEquals(1, responses.size());
         assertEquals(10L, responses.get(0).accountId());
+        assertEquals(CurrencyType.INR, responses.get(0).currency());
     }
 
     @Test
@@ -226,7 +239,13 @@ class CustomerServiceImplTest {
         Account account = account("100000000001");
         customer.setAccounts(List.of(account));
 
-        CustomerResponse response = CustomerResponse.builder().customerId(1L).customerName("Alice").build();
+        account.setCurrency(CurrencyType.EUR);
+
+        CustomerResponse response = CustomerResponse.builder()
+                .customerId(1L)
+                .customerName("Alice")
+                .currency(CurrencyType.EUR)
+                .build();
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
         when(customerMapper.toCustomerResponse(customer, account)).thenReturn(response);
@@ -234,6 +253,7 @@ class CustomerServiceImplTest {
         CustomerResponse result = customerService.getCustomerById(1L);
 
         assertEquals(1L, result.getCustomerId());
+        assertEquals(CurrencyType.EUR, result.getCurrency());
         verify(customerMapper).toCustomerResponse(customer, account);
     }
 
@@ -253,9 +273,14 @@ class CustomerServiceImplTest {
     void getCustomerByAccountNumber_whenExists_shouldReturnMappedResponse() {
         Customer customer = customer(3L, "Charlie");
         Account account = account("100000000003");
+        account.setCurrency(CurrencyType.USD);
         account.setCustomer(customer);
 
-        CustomerResponse response = CustomerResponse.builder().customerId(3L).customerName("Charlie").build();
+        CustomerResponse response = CustomerResponse.builder()
+                .customerId(3L)
+                .customerName("Charlie")
+                .currency(CurrencyType.USD)
+                .build();
 
         when(accountRepository.findByAccountNumber("100000000003")).thenReturn(Optional.of(account));
         when(customerMapper.toCustomerResponse(customer, account)).thenReturn(response);
@@ -263,6 +288,7 @@ class CustomerServiceImplTest {
         CustomerResponse result = customerService.getCustomerByAccountNumber("100000000003");
 
         assertEquals(3L, result.getCustomerId());
+        assertEquals(CurrencyType.USD, result.getCurrency());
         verify(customerMapper).toCustomerResponse(customer, account);
     }
 

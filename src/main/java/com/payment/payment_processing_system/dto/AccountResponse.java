@@ -1,5 +1,6 @@
 package com.payment.payment_processing_system.dto;
 
+import com.payment.payment_processing_system.enums.CurrencyType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,6 @@ public class AccountResponse {
     private BigDecimal balance;
     private String customerName;
     private String email;
-    private String currency;
+    private CurrencyType currency;
 }
 

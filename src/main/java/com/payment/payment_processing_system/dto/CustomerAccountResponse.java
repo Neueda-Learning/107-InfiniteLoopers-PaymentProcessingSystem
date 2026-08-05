@@ -1,6 +1,7 @@
 package com.payment.payment_processing_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.payment.payment_processing_system.enums.CurrencyType;
 
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ public record CustomerAccountResponse(
         String bankName,
         String ifscCode,
         BigDecimal balance,
+        CurrencyType currency,
         @JsonProperty("isActive") boolean isActive
 ) {
 }

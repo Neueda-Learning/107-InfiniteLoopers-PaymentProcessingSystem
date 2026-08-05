@@ -69,12 +69,15 @@ public class DailyTransactionLimitValidator {
                 senderAccount.getDailyTransactionLimit());
 
         if (totalWithCurrentTransaction.compareTo(senderAccount.getDailyTransactionLimit()) > 0) {
+            String currencyLabel = senderAccount.getCurrency() != null
+                    ? senderAccount.getCurrency().name()
+                    : "UNKNOWN";
             throw new DailyTransactionLimitExceededException(
                     "Daily transaction limit exceeded for account [" + senderAccount.getAccountNumber() + "]. "
                     + "Total sent today: " + totalSentToday.toPlainString()
                     + ", Requested amount: " + amount.toPlainString()
                     + ", Daily limit: " + senderAccount.getDailyTransactionLimit().toPlainString()
-                    + " (" + senderAccount.getCurrency().getDescription() + ")");
+                    + " (" + currencyLabel + ")");
         }
 
         log.debug("Daily transaction limit validation passed for account [{}].", senderAccount.getAccountNumber());

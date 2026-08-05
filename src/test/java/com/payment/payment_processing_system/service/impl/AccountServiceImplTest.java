@@ -1,6 +1,7 @@
 package com.payment.payment_processing_system.service.impl;
 
 import com.payment.payment_processing_system.dto.AccountResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
 import com.payment.payment_processing_system.mapper.AccountMapper;
 import com.payment.payment_processing_system.model.Account;
@@ -45,6 +46,7 @@ class AccountServiceImplTest {
         account.setBankName("HDFC Bank");
         account.setIfscCode("HDFC0005678");
         account.setBalance(new BigDecimal("50000.00"));
+        account.setCurrency(CurrencyType.INR);
         account.setCustomer(customer);
 
         AccountResponse response = AccountResponse.builder()
@@ -54,7 +56,7 @@ class AccountServiceImplTest {
                 .balance(new BigDecimal("50000.00"))
                 .customerName("Alice Johnson")
                 .email("alice@example.com")
-                .currency(null)
+                .currency(CurrencyType.INR)
                 .build();
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
@@ -63,6 +65,7 @@ class AccountServiceImplTest {
         AccountResponse result = accountService.getAccountById(1L);
 
         assertEquals("Alice Johnson", result.getCustomerName());
+        assertEquals(CurrencyType.INR, result.getCurrency());
     }
 
     @Test

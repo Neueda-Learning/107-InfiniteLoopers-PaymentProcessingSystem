@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_ACCOUNT,
     INVALID_AMOUNT,
     INVALID_STATUS_TRANSITION,
+    UNSUPPORTED_EXCHANGE_RATE,
 
     // 401 - Authentication
     INVALID_UPI_PIN,

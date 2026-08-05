@@ -1,6 +1,8 @@
 package com.payment.payment_processing_system.controller;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentResponse;
 import com.payment.payment_processing_system.dto.PaymentResponse;
 import jakarta.validation.Valid;
 import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
@@ -9,7 +11,6 @@ import com.payment.payment_processing_system.enums.PaymentStatus;
 import com.payment.payment_processing_system.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,22 +31,29 @@ public class PaymentController {
     /**
      * POST /api/payments/send
      * Initiate a new payment transaction.
-     * Optionally accepts an Idempotency-Key header so duplicate client retries
-     * can safely return the original payment instead of creating a new one.
      *
      * @param paymentRequest the payment details including sender, receiver, amount and UPI PIN
-     * @param idempotencyKey optional idempotency key supplied by the client
-     * @return 201 CREATED for a new payment or 200 OK for an idempotent replay
+     * @return 201 CREATED with payment execution details
      */
     @PostMapping("/send")
-    public ResponseEntity<PaymentResponse> sendMoney(
-            @Valid @RequestBody PaymentRequest paymentRequest,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+    public ResponseEntity<PaymentResponse> sendMoney(@Valid @RequestBody PaymentRequest paymentRequest) {
         log.info("POST /api/payments/send - Initiating payment from account: {}",
                 paymentRequest.getSenderAccountNumber());
-        PaymentResponse response = paymentService.sendMoney(paymentRequest, idempotencyKey);
-        HttpStatus status = response.isIdempotentReplay() ? HttpStatus.OK : HttpStatus.CREATED;
-        return ResponseEntity.status(status).body(response);
+        PaymentResponse response = paymentService.sendMoney(paymentRequest);
+        return ResponseEntity.status(201).body(response);
+    }
+
+    /**
+     * POST /api/payments/preview
+     * Preview payment conversion and charges without deducting funds or creating transactions.
+     */
+    @PostMapping("/preview")
+    public ResponseEntity<PreviewPaymentResponse> previewPayment(
+            @Valid @RequestBody PreviewPaymentRequest previewPaymentRequest) {
+        log.info("POST /api/payments/preview - Previewing payment from account: {}",
+                previewPaymentRequest.getSenderAccountNumber());
+        PreviewPaymentResponse response = paymentService.previewPayment(previewPaymentRequest);
+        return ResponseEntity.ok(response);
     }
 
     /**
