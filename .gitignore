@@ -35,3 +35,9 @@ build/
 # Logs
 logs/
 *.log
+
+# Local database files
+.local-db/
+
+# Frontend build files
+frontend/dist/
