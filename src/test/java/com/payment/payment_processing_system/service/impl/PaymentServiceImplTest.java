@@ -2,9 +2,12 @@ package com.payment.payment_processing_system.service.impl;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
 import com.payment.payment_processing_system.dto.PaymentResponse;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
 import com.payment.payment_processing_system.email.EmailService;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.enums.PaymentStatus;
 import com.payment.payment_processing_system.exception.InvalidPaymentException;
 import com.payment.payment_processing_system.exception.TransactionNotFoundException;
@@ -16,6 +19,7 @@ import com.payment.payment_processing_system.model.TransactionStatusHistory;
 import com.payment.payment_processing_system.repository.AccountRepository;
 import com.payment.payment_processing_system.repository.PaymentTransactionRepository;
 import com.payment.payment_processing_system.repository.TransactionStatusHistoryRepository;
+import com.payment.payment_processing_system.service.CurrencyConversionService;
 import com.payment.payment_processing_system.validation.AccountValidator;
 import com.payment.payment_processing_system.validation.BalanceValidator;
 import com.payment.payment_processing_system.validation.PaymentValidator;
@@ -24,6 +28,7 @@ import com.payment.payment_processing_system.validation.StatusTransitionValidato
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -74,6 +79,9 @@ class PaymentServiceImplTest {
     private BalanceValidator balanceValidator;
 
     @Mock
+    private CurrencyConversionService currencyConversionService;
+
+    @Mock
     private RetryValidator retryValidator;
 
     @Mock
@@ -109,6 +117,45 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @DisplayName("sendMoney should apply currency conversion and charge for cross-currency transfer")
+    void sendMoney_whenCrossCurrency_shouldDeductChargeAndCreditConvertedAmount() {
+        PaymentRequest request = validRequest();
+        Account sender = senderAccount();
+        sender.setCurrency(CurrencyType.USD);
+        sender.setBalance(new BigDecimal("1000.00"));
+        Account receiver = receiverAccount();
+        receiver.setCurrency(CurrencyType.INR);
+        receiver.setBalance(new BigDecimal("30000.00"));
+
+        when(paymentTransactionRepository.findByIdempotencyKey("IDEMPKEY123")).thenReturn(Optional.empty());
+        when(accountRepository.findByAccountNumber("100000000001")).thenReturn(Optional.of(sender));
+        when(accountRepository.findByAccountNumber("100000000002")).thenReturn(Optional.of(receiver));
+        when(currencyConversionService.getExchangeRate(CurrencyType.USD, CurrencyType.INR)).thenReturn(new BigDecimal("87"));
+        when(currencyConversionService.convertAmount(new BigDecimal("100.00"), CurrencyType.USD, CurrencyType.INR))
+                .thenReturn(new BigDecimal("8700.0000"));
+        when(currencyConversionService.calculateTransferCharge(new BigDecimal("100.00"), CurrencyType.USD, CurrencyType.INR))
+                .thenReturn(new BigDecimal("2.0000"));
+        when(paymentTransactionRepository.save(any(PaymentTransaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(transactionStatusHistoryRepository.save(any(TransactionStatusHistory.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PaymentResponse response = paymentService.sendMoney(request, "IDEMPKEY123");
+
+        assertEquals("COMPLETED", response.getPaymentStatus());
+        assertEquals(new BigDecimal("898.0000"), sender.getBalance());
+        assertEquals(new BigDecimal("38700.0000"), receiver.getBalance());
+
+        ArgumentCaptor<PaymentTransaction> transactionCaptor = ArgumentCaptor.forClass(PaymentTransaction.class);
+        verify(paymentTransactionRepository, times(4)).save(transactionCaptor.capture());
+        PaymentTransaction created = transactionCaptor.getAllValues().get(0);
+        assertEquals(CurrencyType.USD, created.getSenderCurrency());
+        assertEquals(CurrencyType.INR, created.getReceiverCurrency());
+        assertEquals(new BigDecimal("87"), created.getExchangeRate());
+        assertEquals(new BigDecimal("2.0000"), created.getTransferCharge());
+        assertEquals(new BigDecimal("8700.0000"), created.getConvertedAmount());
+    }
+
+    @Test
     @DisplayName("sendMoney should return replay response for same idempotency key and payload")
     void sendMoney_whenIdempotencyKeyAlreadyExistsWithSamePayload_shouldReturnReplay() {
         PaymentRequest request = validRequest();
@@ -122,6 +169,69 @@ class PaymentServiceImplTest {
         assertEquals("TXN-REPLAY", response.getTransactionId());
         assertEquals("Duplicate payment request detected. Returning existing transaction.", response.getMessage());
         verify(accountRepository, never()).findByAccountNumber(anyString());
+    }
+
+    @Test
+    @DisplayName("previewPayment should return conversion details without creating transaction")
+    void previewPayment_whenValidCrossCurrencyRequest_shouldReturnPreviewOnly() {
+        PreviewPaymentRequest request = validPreviewRequest();
+        Account sender = senderAccount();
+        sender.setCurrency(CurrencyType.USD);
+        Account receiver = receiverAccount();
+        receiver.setCurrency(CurrencyType.INR);
+
+        when(accountRepository.findByAccountNumber("100000000001")).thenReturn(Optional.of(sender));
+        when(accountRepository.findByAccountNumber("100000000002")).thenReturn(Optional.of(receiver));
+        when(currencyConversionService.getExchangeRate(CurrencyType.USD, CurrencyType.INR))
+                .thenReturn(new BigDecimal("87"));
+        when(currencyConversionService.convertAmount(new BigDecimal("100.00"), CurrencyType.USD, CurrencyType.INR))
+                .thenReturn(new BigDecimal("8700.0000"));
+        when(currencyConversionService.calculateTransferCharge(new BigDecimal("100.00"), CurrencyType.USD, CurrencyType.INR))
+                .thenReturn(new BigDecimal("2.0000"));
+
+        PreviewPaymentResponse response = paymentService.previewPayment(request);
+
+        assertEquals(CurrencyType.USD, response.getSenderCurrency());
+        assertEquals(CurrencyType.INR, response.getReceiverCurrency());
+        assertEquals(new BigDecimal("87"), response.getExchangeRate());
+        assertEquals(new BigDecimal("100.00"), response.getOriginalAmount());
+        assertEquals(new BigDecimal("8700.0000"), response.getConvertedAmount());
+        assertEquals(new BigDecimal("2.0000"), response.getTransferCharge());
+        assertEquals(new BigDecimal("102.0000"), response.getTotalDeducted());
+        assertTrue(response.isConversionRequired());
+
+        verify(accountValidator).validateSenderAccount(sender);
+        verify(accountValidator).validateReceiverAccount(receiver);
+        verify(paymentTransactionRepository, never()).save(any(PaymentTransaction.class));
+        verify(transactionStatusHistoryRepository, never()).save(any(TransactionStatusHistory.class));
+        verify(accountRepository, never()).save(any(Account.class));
+        verify(emailService, never()).sendNotification(anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("previewPayment should return domestic preview without conversion charge")
+    void previewPayment_whenSameCurrency_shouldReturnDomesticPreview() {
+        PreviewPaymentRequest request = validPreviewRequest();
+        Account sender = senderAccount();
+        sender.setCurrency(CurrencyType.INR);
+        Account receiver = receiverAccount();
+        receiver.setCurrency(CurrencyType.INR);
+
+        when(accountRepository.findByAccountNumber("100000000001")).thenReturn(Optional.of(sender));
+        when(accountRepository.findByAccountNumber("100000000002")).thenReturn(Optional.of(receiver));
+        when(currencyConversionService.getExchangeRate(CurrencyType.INR, CurrencyType.INR))
+                .thenReturn(BigDecimal.ONE);
+        when(currencyConversionService.convertAmount(new BigDecimal("100.00"), CurrencyType.INR, CurrencyType.INR))
+                .thenReturn(new BigDecimal("100.0000"));
+        when(currencyConversionService.calculateTransferCharge(new BigDecimal("100.00"), CurrencyType.INR, CurrencyType.INR))
+                .thenReturn(new BigDecimal("0.0000"));
+
+        PreviewPaymentResponse response = paymentService.previewPayment(request);
+
+        assertFalse(response.isConversionRequired());
+        assertEquals(new BigDecimal("100.0000"), response.getConvertedAmount());
+        assertEquals(new BigDecimal("0.0000"), response.getTransferCharge());
+        assertEquals(new BigDecimal("100.0000"), response.getTotalDeducted());
     }
 
     @Test
@@ -237,6 +347,14 @@ class PaymentServiceImplTest {
                 .build();
     }
 
+    private PreviewPaymentRequest validPreviewRequest() {
+        return PreviewPaymentRequest.builder()
+                .senderAccountNumber("100000000001")
+                .receiverAccountNumber("100000000002")
+                .amount(new BigDecimal("100.00"))
+                .build();
+    }
+
     private Account senderAccount() {
         Customer customer = new Customer();
         customer.setCustomerName("Alice Johnson");
@@ -246,6 +364,7 @@ class PaymentServiceImplTest {
         sender.setAccountNumber("100000000001");
         sender.setIfscCode("SBIN0001234");
         sender.setBalance(new BigDecimal("50000.00"));
+        sender.setCurrency(CurrencyType.INR);
         sender.setUpiPin("1234");
         sender.setCustomer(customer);
         return sender;
@@ -260,6 +379,7 @@ class PaymentServiceImplTest {
         receiver.setAccountNumber("100000000002");
         receiver.setIfscCode("HDFC0005678");
         receiver.setBalance(new BigDecimal("30000.00"));
+        receiver.setCurrency(CurrencyType.INR);
         receiver.setUpiPin("5678");
         receiver.setCustomer(customer);
         return receiver;

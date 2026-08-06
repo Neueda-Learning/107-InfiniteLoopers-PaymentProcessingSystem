@@ -2,6 +2,7 @@ package com.payment.payment_processing_system.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.enums.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,6 +43,23 @@ public class PaymentTransaction {
 
     @Column(nullable = false)
     private BigDecimal amount;
+
+    @Column(name = "sender_currency", length = 10)
+    @Enumerated(EnumType.STRING)
+    private CurrencyType senderCurrency;
+
+    @Column(name = "receiver_currency", length = 10)
+    @Enumerated(EnumType.STRING)
+    private CurrencyType receiverCurrency;
+
+    @Column(name = "exchange_rate", precision = 19, scale = 10)
+    private BigDecimal exchangeRate;
+
+    @Column(name = "transfer_charge", precision = 19, scale = 4)
+    private BigDecimal transferCharge;
+
+    @Column(name = "converted_amount", precision = 19, scale = 4)
+    private BigDecimal convertedAmount;
 
     @Column(nullable = true, length = 500)
     private String description;

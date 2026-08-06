@@ -1,6 +1,8 @@
 package com.payment.payment_processing_system.service;
 
 import com.payment.payment_processing_system.dto.PaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentResponse;
 import com.payment.payment_processing_system.dto.PaymentResponse;
 import com.payment.payment_processing_system.dto.TransactionStatusHistoryResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
@@ -30,6 +32,14 @@ public interface PaymentService {
      * @return the PaymentResponse with transaction confirmation or an idempotent replay result
      */
     PaymentResponse sendMoney(PaymentRequest paymentRequest, String idempotencyKey);
+
+    /**
+     * Preview a payment conversion and charges without creating a transaction.
+     *
+     * @param previewPaymentRequest preview request containing sender, receiver and amount
+     * @return payment preview details
+     */
+    PreviewPaymentResponse previewPayment(PreviewPaymentRequest previewPaymentRequest);
 
     /**
      * Retry a failed payment transaction.

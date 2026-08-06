@@ -1,6 +1,7 @@
 package com.payment.payment_processing_system.mapper;
 
 import com.payment.payment_processing_system.dto.TransactionResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.enums.PaymentStatus;
 import com.payment.payment_processing_system.model.Account;
 import com.payment.payment_processing_system.model.Customer;
@@ -51,6 +52,11 @@ class TransactionMapperTest {
                 .senderAccount(senderAccount)
                 .receiverAccount(receiverAccount)
                 .amount(new BigDecimal("1500.00"))
+                .senderCurrency(CurrencyType.USD)
+                .receiverCurrency(CurrencyType.INR)
+                .exchangeRate(new BigDecimal("87"))
+                .transferCharge(new BigDecimal("30.0000"))
+                .convertedAmount(new BigDecimal("130500.0000"))
                 .description("Salary payment")
                 .paymentStatus(PaymentStatus.COMPLETED)
                 .createdTime(createdTime)
@@ -67,6 +73,11 @@ class TransactionMapperTest {
         assertEquals("100000000001", response.getSenderAccountNumber());
         assertEquals("100000000002", response.getReceiverAccountNumber());
         assertEquals(new BigDecimal("1500.00"), response.getAmount());
+        assertEquals(CurrencyType.USD, response.getSenderCurrency());
+        assertEquals(CurrencyType.INR, response.getReceiverCurrency());
+        assertEquals(new BigDecimal("87"), response.getExchangeRate());
+        assertEquals(new BigDecimal("30.0000"), response.getTransferCharge());
+        assertEquals(new BigDecimal("130500.0000"), response.getConvertedAmount());
         assertEquals("Salary payment", response.getDescription());
         assertEquals("COMPLETED", response.getPaymentStatus());
         assertEquals(createdTime, response.getCreatedTime());
