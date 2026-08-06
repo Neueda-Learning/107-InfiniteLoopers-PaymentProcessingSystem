@@ -176,7 +176,7 @@ flowchart TD
 flowchart TD
     A[PaymentServiceImpl status update] --> B[recordStatusHistory]
     B --> C[transaction_status_history table]
-    C --> D[GET /api/payments/{transactionId}/history]
+    C --> D["GET /api/payments/{transactionId}/history"]
     D --> E[Chronological audit timeline in frontend]
 ```
 
