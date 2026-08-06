@@ -37,4 +37,10 @@ public class ErrorResponse {
 
     /** The request URI path that triggered the error. */
     private String path;
+
+    /**
+     * The transaction ID of the failed transaction, if one was created before the failure.
+     * Present only for payment validation failures (balance, daily limit, UPI PIN).
+     */
+    private String transactionId;
 }

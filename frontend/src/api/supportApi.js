@@ -69,3 +69,17 @@ export function getSupportTransactionsByStatus(status) {
   });
 }
 
+export function getAuditTrail() {
+  if (DEMO_MODE) {
+    return findDemoTransactionsByStatus('FAILED');
+  }
+
+  return apiRequest('/support/audit').catch((error) => {
+    if (isBackendUnavailable(error)) {
+      return findDemoTransactionsByStatus('FAILED');
+    }
+
+    throw error;
+  });
+}
+

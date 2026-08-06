@@ -78,5 +78,18 @@ public class SupportController {
         List<TransactionResponse> transactions = supportService.getTransactionsByStatus(status);
         return ResponseEntity.ok(transactions);
     }
+
+    /**
+     * GET /api/support/audit
+     * Retrieve audit trail of all FAILED transactions with failure reasons, newest first.
+     *
+     * @return 200 OK with list of FAILED TransactionResponse objects including failureReason
+     */
+    @GetMapping("/audit")
+    public ResponseEntity<List<TransactionResponse>> getAuditTrail() {
+        log.info("GET /api/support/audit - Fetching failed transaction audit trail");
+        List<TransactionResponse> auditTrail = supportService.getAuditTrail();
+        return ResponseEntity.ok(auditTrail);
+    }
 }
 

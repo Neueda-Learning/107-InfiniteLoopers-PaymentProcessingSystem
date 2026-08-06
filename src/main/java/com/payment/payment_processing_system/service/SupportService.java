@@ -40,5 +40,13 @@ public interface SupportService {
      * @return a List of TransactionResponse objects with the specified status
      */
     List<TransactionResponse> getTransactionsByStatus(PaymentStatus paymentStatus);
+
+    /**
+     * Retrieve all FAILED transactions ordered by failed time descending.
+     * Used for the audit trail showing failure reasons.
+     *
+     * @return a List of TransactionResponse objects with FAILED status and failure reasons
+     */
+    List<TransactionResponse> getAuditTrail();
 }
 

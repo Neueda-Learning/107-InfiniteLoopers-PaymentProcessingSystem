@@ -89,6 +89,9 @@ public class PaymentTransaction {
     @Column(name = "failed_time")
     private LocalDateTime failedTime;
 
+    @Column(name = "failure_reason", length = 1000)
+    private String failureReason;
+
     @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TransactionStatusHistory> statusHistory;
 

@@ -317,7 +317,23 @@ export function PaymentPage() {
       setActiveStep(5);
       setShowSuccessPopup(true);
     } catch (error) {
-      setErrorMessage(error.message || 'Unable to send payment.');
+      // Payment was rejected (wrong PIN, insufficient balance, or daily limit exceeded).
+      // The transaction is still saved in the database as FAILED.
+      // Navigate to Step 5 so the user sees the FAILED outcome clearly.
+      setResult({
+        transactionId: error.details?.transactionId || null,
+        paymentStatus: 'FAILED',
+        message: error.message || 'Payment failed. Please check your balance, daily limit, or UPI PIN.',
+        amount: numericAmount,
+        senderCurrency: senderAccount?.currency,
+        receiverCurrency: receiver?.currency,
+        convertedAmount: numericAmount,
+        senderAccountNumber: senderAccount?.accountNumber,
+        receiverAccountNumber: receiver?.accountNumber,
+        transactionTime: new Date().toISOString(),
+      });
+      setUpiPin('');
+      setActiveStep(5);
     } finally {
       setSending(false);
     }
@@ -594,7 +610,7 @@ export function PaymentPage() {
         </div>
       ) : null}
 
-      {showSuccessPopup && result ? (
+      {showSuccessPopup && result && result.paymentStatus !== 'FAILED' ? (
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Payment successful">
           <div className="modal-card modal-card--success">
             <div className="success-icon" aria-hidden="true">
