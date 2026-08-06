@@ -1,55 +1,74 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { getAllCustomers } from '../../api/customerApi';
-import { sendPayment } from '../../api/paymentApi';
-import {
-  ErrorAlert,
-  LoadingState,
-  PageHeader,
-  SectionCard,
-  StatusBadge,
-  SuccessAlert,
-} from '../../components/UI';
-import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { validatePaymentForm } from '../../utils/validators';
+import { useEffect, useMemo, useState } from 'react';
+import { getAccountByNumber, getCustomerAccounts, getCustomers } from '../../api/customerApi';
+import { previewPayment, sendPayment } from '../../api/paymentApi';
+import { ErrorAlert, LoadingState, PageHeader, SuccessAlert } from '../../components/UI';
+import { CustomerSelector } from './CustomerSelector';
+import { PaymentConfirmation } from './PaymentConfirmation';
+import { PaymentPreview } from './PaymentPreview';
+import { PaymentSuccess } from './PaymentSuccess';
+import { ReceiverDetails } from './ReceiverDetails';
+import { SenderAccountDetails } from './SenderAccountDetails';
 
-const initialForm = {
-  senderAccountNumber: '',
-  receiverAccountNumber: '',
-  receiverIfscCode: '',
-  amount: '',
-  description: '',
-  upiPin: '',
-};
+function parseAmount(value) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : NaN;
+}
 
-const ACCOUNT_NUMBER_PATTERN = /^\d+$/;
-const IFSC_PATTERN = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+function isValidUpiPin(value) {
+  return /^\d{4}$/.test(value);
+}
 
 export function PaymentPage() {
   const [customers, setCustomers] = useState([]);
-  const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [selectedSenderAccountNumber, setSelectedSenderAccountNumber] = useState('');
+  const [receiverAccountNumber, setReceiverAccountNumber] = useState('');
+  const [receiver, setReceiver] = useState(null);
+
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [upiPin, setUpiPin] = useState('');
+
+  const [preview, setPreview] = useState(null);
+  const [result, setResult] = useState(null);
+
   const [loadingCustomers, setLoadingCustomers] = useState(true);
-  const [apiError, setApiError] = useState('');
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
+  const [loadingReceiver, setLoadingReceiver] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [receipt, setReceipt] = useState(null);
-  const [largeAmountWarningOpen, setLargeAmountWarningOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingPayload, setPendingPayload] = useState(null);
-  const submissionGuard = useRef(false);
+
+  const senderAccount = useMemo(
+    () => accounts.find((account) => account.accountNumber === selectedSenderAccountNumber) || null,
+    [accounts, selectedSenderAccountNumber],
+  );
+
+  const hasSender = Boolean(senderAccount);
+  const hasReceiver = Boolean(receiver);
+  const numericAmount = parseAmount(amount);
+  const canPreview = hasSender && hasReceiver && Number.isFinite(numericAmount) && numericAmount > 0;
+  const canEnterConfirmation = Boolean(preview);
+  const canSend = canEnterConfirmation && isValidUpiPin(upiPin) && !sending;
 
   useEffect(() => {
     let active = true;
 
     async function loadCustomers() {
+      setLoadingCustomers(true);
+
       try {
-        const response = await getAllCustomers();
+        const response = await getCustomers();
         if (active) {
           setCustomers(response);
         }
-      } catch (err) {
+      } catch (error) {
         if (active) {
-          setApiError(err.message || 'Unable to load customer suggestions.');
+          setErrorMessage(error.message || 'Unable to load customers.');
         }
       } finally {
         if (active) {
@@ -64,562 +83,245 @@ export function PaymentPage() {
     };
   }, []);
 
-  const customerOptions = useMemo(() => {
-    return customers.map((customer) => ({
-      label: `${customer.customerName} • ${customer.accountNumber}`,
-      value: customer.accountNumber,
-      ifscCode: customer.ifscCode,
-      bankName: customer.bankName,
-      name: customer.customerName,
-      balance: customer.balance,
-    }));
-  }, [customers]);
-
-  const customerByAccount = useMemo(() => {
-    return customerOptions.reduce((acc, customer) => {
-      acc[customer.value] = customer;
-      return acc;
-    }, {});
-  }, [customerOptions]);
-
-  const knownAccounts = useMemo(() => new Set(customerOptions.map((customer) => customer.value)), [customerOptions]);
-
-  const senderAccount = form.senderAccountNumber.trim();
-  const receiverAccount = form.receiverAccountNumber.trim();
-  const receiverIfsc = form.receiverIfscCode.trim().toUpperCase();
-
-  const senderAccountValid = senderAccount && ACCOUNT_NUMBER_PATTERN.test(senderAccount) && knownAccounts.has(senderAccount);
-  const receiverAccountValid =
-    receiverAccount
-    && ACCOUNT_NUMBER_PATTERN.test(receiverAccount)
-    && knownAccounts.has(receiverAccount)
-    && receiverAccount !== senderAccount;
-  const receiverExpectedIfsc = receiverAccountValid ? customerByAccount[receiverAccount]?.ifscCode?.toUpperCase() : '';
-  const receiverIfscValid =
-    IFSC_PATTERN.test(receiverIfsc)
-    && (!receiverExpectedIfsc || receiverIfsc === receiverExpectedIfsc);
-
-  const canEnterReceiver = Boolean(senderAccountValid);
-  const canEnterIfsc = Boolean(receiverAccountValid);
-  const canEnterRemaining = Boolean(receiverAccountValid && receiverIfscValid);
-
-  function showStageAlert(message) {
-    setApiError(message);
+  function resetPreviewAndResult() {
+    setPreview(null);
+    setResult(null);
     setSuccessMessage('');
   }
 
-  function blockIfLocked(isLocked, message, event) {
-    if (!isLocked) {
+  async function handleSelectCustomer(customerId) {
+    setSelectedCustomerId(customerId);
+    setSelectedSenderAccountNumber('');
+    setAccounts([]);
+    setReceiverAccountNumber('');
+    setReceiver(null);
+    setAmount('');
+    setUpiPin('');
+    setDescription('');
+    resetPreviewAndResult();
+    setErrorMessage('');
+
+    if (!customerId) {
       return;
     }
 
-    event.preventDefault();
-    showStageAlert(message);
+    setLoadingAccounts(true);
+    try {
+      const customerAccounts = await getCustomerAccounts(customerId);
+      setAccounts(customerAccounts);
+      if (customerAccounts.length > 0) {
+        setSelectedSenderAccountNumber(customerAccounts[0].accountNumber);
+      }
+    } catch (error) {
+      setErrorMessage(error.message || 'Unable to fetch sender accounts.');
+    } finally {
+      setLoadingAccounts(false);
+    }
   }
 
-  function handleChange(event) {
-    const { name } = event.target;
-    let { value } = event.target;
-
-    if (name === 'senderAccountNumber' || name === 'receiverAccountNumber') {
-      value = value.replace(/\D/g, '');
-    }
-
-    if (name === 'receiverIfscCode') {
-      value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
-    }
-
-    if (name === 'upiPin') {
-      value = value.replace(/\D/g, '').slice(0, 4);
-    }
-
-    setForm((current) => ({ ...current, [name]: value }));
-    setErrors((current) => ({ ...current, [name]: '' }));
-    setApiError('');
-    setSuccessMessage('');
+  function handleSelectSenderAccount(accountNumber) {
+    setSelectedSenderAccountNumber(accountNumber);
+    setReceiverAccountNumber('');
+    setReceiver(null);
+    setAmount('');
+    setUpiPin('');
+    setDescription('');
+    resetPreviewAndResult();
+    setErrorMessage('');
   }
 
-  function applySampleTransaction() {
-    if (customerOptions.length < 2) {
+  function handleReceiverAccountChange(value) {
+    setReceiverAccountNumber(value);
+    setReceiver(null);
+    setUpiPin('');
+    resetPreviewAndResult();
+    setErrorMessage('');
+  }
+
+  async function handleLookupReceiver() {
+    if (!hasSender) {
+      setErrorMessage('Select sender account before fetching receiver details.');
       return;
     }
 
-    setForm({
-      senderAccountNumber: customerOptions[0].value,
-      receiverAccountNumber: customerOptions[1].value,
-      receiverIfscCode: customerOptions[1].ifscCode,
-      amount: '2500',
-      description: 'Sample payment from frontend',
-      upiPin: '1234',
-    });
-    setErrors({});
-    setApiError('');
-    setSuccessMessage('Sample data applied. You can submit directly or edit the values.');
-  }
+    const trimmedReceiverAccount = receiverAccountNumber.trim();
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const validationErrors = validatePaymentForm(form, {
-      knownAccounts: Array.from(knownAccounts),
-      receiverExpectedIfsc,
-    });
-    setErrors(validationErrors);
-    setApiError('');
-    setSuccessMessage('');
-
-    if (Object.keys(validationErrors).length > 0) {
+    if (!trimmedReceiverAccount) {
+      setErrorMessage('Receiver account number is required.');
       return;
     }
 
-    const amount = Number(form.amount);
-    const payload = {
-      ...form,
-      amount,
-    };
-
-    if (amount > 10000) {
-      setPendingPayload(payload);
-      setLargeAmountWarningOpen(true);
+    if (trimmedReceiverAccount === selectedSenderAccountNumber) {
+      setErrorMessage('Sender and receiver account numbers cannot be the same.');
       return;
     }
 
-    setPendingPayload(payload);
-    setConfirmOpen(true);
-  }
-
-  function cancelPendingSubmission() {
-    setConfirmOpen(false);
-    setPendingPayload(null);
-    submissionGuard.current = false;
-    setSuccessMessage('Payment canceled.');
-  }
-
-  function handleLargeAmountWarningConfirm() {
-    setLargeAmountWarningOpen(false);
-    setConfirmOpen(true);
-  }
-
-  function handleLargeAmountWarningCancel() {
-    setLargeAmountWarningOpen(false);
-    setPendingPayload(null);
-    setSuccessMessage('Payment canceled.');
-  }
-
-  async function proceedWithPendingSubmission() {
-    if (!pendingPayload || submissionGuard.current) {
-      return;
-    }
-
-    submissionGuard.current = true;
-    setConfirmOpen(false);
-    setSubmitting(true);
+    setLoadingReceiver(true);
+    setErrorMessage('');
 
     try {
-      const response = await sendPayment(pendingPayload);
-
-      setReceipt(response);
-      setSuccessMessage(response.message || 'Payment created successfully.');
-
-      setForm((current) => ({ ...initialForm, senderAccountNumber: current.senderAccountNumber }));
-      setPendingPayload(null);
-    } catch (err) {
-      setApiError(err.message || 'Unable to submit the payment.');
+      const receiverDetails = await getAccountByNumber(trimmedReceiverAccount);
+      setReceiver(receiverDetails);
+    } catch (error) {
+      setReceiver(null);
+      setErrorMessage(error.message || 'Unable to fetch receiver details.');
     } finally {
-      setSubmitting(false);
-      submissionGuard.current = false;
+      setLoadingReceiver(false);
     }
   }
 
-  useEffect(() => {
-    return () => {
-      setLargeAmountWarningOpen(false);
-      setConfirmOpen(false);
-      setPendingPayload(null);
-      submissionGuard.current = false;
+  function handleAmountChange(value) {
+    setAmount(value);
+    setUpiPin('');
+    resetPreviewAndResult();
+    setErrorMessage('');
+  }
+
+  async function handlePreviewPayment() {
+    if (!canPreview) {
+      setErrorMessage('Select sender, fetch receiver, and enter a valid amount to preview payment.');
+      return;
+    }
+
+    const previewPayload = {
+      senderAccountNumber: selectedSenderAccountNumber,
+      receiverAccountNumber: receiver.accountNumber,
+      amount: numericAmount,
     };
-  }, []);
 
-  function handleResetForm() {
-    setForm(initialForm);
-    setErrors({});
-    setApiError('');
-    setSuccessMessage('');
-    setLargeAmountWarningOpen(false);
-    setConfirmOpen(false);
-    setPendingPayload(null);
-    submissionGuard.current = false;
+    setPreviewing(true);
+    setErrorMessage('');
+
+    try {
+      const previewResponse = await previewPayment(previewPayload);
+      setPreview(previewResponse);
+      setSuccessMessage('Payment preview generated successfully.');
+    } catch (error) {
+      setPreview(null);
+      setErrorMessage(error.message || 'Unable to preview payment.');
+    } finally {
+      setPreviewing(false);
+    }
   }
 
-  function getConfirmationSummary() {
-    if (!pendingPayload) {
-      return '';
+  async function handleSendPayment() {
+    if (!preview) {
+      setErrorMessage('Generate payment preview before sending.');
+      return;
     }
 
-    return `${pendingPayload.senderAccountNumber} → ${pendingPayload.receiverAccountNumber} (${formatCurrency(pendingPayload.amount)})`;
+    if (!isValidUpiPin(upiPin)) {
+      setErrorMessage('UPI PIN must contain exactly 4 digits.');
+      return;
+    }
+
+    if (!senderAccount || !receiver) {
+      setErrorMessage('Sender and receiver details are required.');
+      return;
+    }
+
+    const payload = {
+      senderAccountNumber: senderAccount.accountNumber,
+      receiverAccountNumber: receiver.accountNumber,
+      receiverIfscCode: receiver.ifscCode,
+      amount: numericAmount,
+      upiPin,
+      ...(description.trim() ? { description: description.trim() } : {}),
+    };
+
+    setSending(true);
+    setErrorMessage('');
+
+    try {
+      const paymentResponse = await sendPayment(payload);
+      setResult(paymentResponse);
+      setSuccessMessage(paymentResponse.message || 'Payment completed successfully.');
+      setUpiPin('');
+    } catch (error) {
+      setErrorMessage(error.message || 'Unable to send payment.');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function handleCreateAnotherPayment() {
+    setReceiverAccountNumber('');
+    setReceiver(null);
+    setAmount('');
+    setDescription('');
+    setUpiPin('');
+    setPreview(null);
+    setResult(null);
+    setErrorMessage('');
+    setSuccessMessage('Ready to create another payment.');
   }
 
   return (
     <div className="page-stack">
       <PageHeader
         eyebrow="Money transfer"
-        title="Send payment"
-        description="Create a new payment request using the same fields expected by the backend `PaymentRequest` DTO."
-        actions={
-          <button type="button" className="secondary-button" onClick={applySampleTransaction}>
-            Use sample data
-          </button>
-        }
+        title="Payments"
+        description="Complete payment flow aligned with backend APIs: select sender, fetch receiver, preview charges, confirm with UPI PIN, and submit transaction."
       />
 
-      <ErrorAlert message={apiError} onDismiss={() => setApiError('')} />
+      <ErrorAlert message={errorMessage} onDismiss={() => setErrorMessage('')} />
       <SuccessAlert message={successMessage} onDismiss={() => setSuccessMessage('')} />
 
-      {largeAmountWarningOpen ? (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: '#0f172a',
-              borderRadius: '24px',
-              border: '2px solid #f59e0b',
-              padding: '32px',
-              maxWidth: '500px',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(245, 158, 11, 0.3)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 16px 0', fontSize: '1.5rem', color: '#fbbf24' }}>⚠️ Large Amount Warning</h2>
-            <p style={{ margin: '0 0 24px 0', color: '#cbd5e1', fontSize: '1rem' }}>
-              You are about to transfer a large amount of <strong style={{ color: '#fbbf24' }}>{formatCurrency(pendingPayload?.amount || 0)}</strong>.
-            </p>
-            <p style={{ margin: '0 0 24px 0', color: '#cbd5e1', fontSize: '0.95rem' }}>
-              Please confirm that you want to proceed with this transaction.
-            </p>
-            <div
-              style={{
-                display: 'flex',
-                gap: '12px',
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleLargeAmountWarningConfirm}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  backgroundColor: '#f59e0b',
-                  color: '#1f2937',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                ✓ Yes, Continue
-              </button>
-              <button
-                type="button"
-                onClick={handleLargeAmountWarningCancel}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  backgroundColor: '#ef4444',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                ✕ Cancel Transfer
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {loadingCustomers ? <LoadingState label="Loading customers..." /> : null}
 
-      {confirmOpen ? (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: '#0f172a',
-              borderRadius: '24px',
-              border: '2px solid #2563eb',
-              padding: '32px',
-              maxWidth: '500px',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(37, 99, 235, 0.3)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 16px 0', fontSize: '1.5rem', color: '#f8fafc' }}>Confirm Payment</h2>
-            <p style={{ margin: '0 0 24px 0', color: '#cbd5e1', fontSize: '1rem' }}>
-              Please confirm this transaction:
-            </p>
-            <div
-              style={{
-                backgroundColor: 'rgba(37, 99, 235, 0.15)',
-                border: '1px solid rgba(37, 99, 235, 0.3)',
-                borderRadius: '16px',
-                padding: '16px',
-                marginBottom: '24px',
-                fontFamily: 'monospace',
-                fontSize: '0.95rem',
-                color: '#93c5fd',
-                wordBreak: 'break-all',
-              }}
-            >
-              {getConfirmationSummary()}
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                gap: '12px',
-              }}
-            >
-              <button
-                type="button"
-                onClick={proceedWithPendingSubmission}
-                disabled={submitting}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  backgroundColor: '#22c55e',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  opacity: submitting ? 0.6 : 1,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                ✓ Confirm
-              </button>
-              <button
-                type="button"
-                onClick={cancelPendingSubmission}
-                disabled={submitting}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  backgroundColor: '#ef4444',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  opacity: submitting ? 0.6 : 1,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                ✕ Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {!loadingCustomers ? (
+        <div className="payment-flow-grid">
+          <CustomerSelector
+            customers={customers}
+            selectedCustomerId={selectedCustomerId}
+            onSelectCustomer={handleSelectCustomer}
+            loading={loadingAccounts}
+          />
 
-      <div className="content-grid content-grid--2col">
-        <SectionCard title="Payment form" subtitle="Validated on the client before calling `POST /api/payments/send`.">
-          <form className="form-grid" onSubmit={handleSubmit}>
-            <label>
-              <span>Sender account number</span>
-              <input
-                name="senderAccountNumber"
-                value={form.senderAccountNumber}
-                onChange={handleChange}
-                placeholder="100000000001"
-                inputMode="numeric"
-              />
-              {errors.senderAccountNumber ? <small className="field-error">{errors.senderAccountNumber}</small> : null}
-            </label>
-
-            <label onMouseDown={(event) => blockIfLocked(!canEnterReceiver, 'Enter a valid sender account number first.', event)}>
-              <span>Receiver account number</span>
-              <input
-                name="receiverAccountNumber"
-                value={form.receiverAccountNumber}
-                onChange={handleChange}
-                placeholder="100000000002"
-                inputMode="numeric"
-                disabled={!canEnterReceiver}
-              />
-              {errors.receiverAccountNumber ? <small className="field-error">{errors.receiverAccountNumber}</small> : null}
-            </label>
-
-            <label onMouseDown={(event) => blockIfLocked(!canEnterIfsc, 'Enter a valid receiver account number first.', event)}>
-              <span>Receiver IFSC code</span>
-              <input
-                name="receiverIfscCode"
-                value={form.receiverIfscCode}
-                onChange={handleChange}
-                placeholder="HDFC0005678"
-                disabled={!canEnterIfsc}
-              />
-              {errors.receiverIfscCode ? <small className="field-error">{errors.receiverIfscCode}</small> : null}
-            </label>
-
-            <label onMouseDown={(event) => blockIfLocked(!canEnterRemaining, 'Enter a valid IFSC code for the receiver account first.', event)}>
-              <span>Amount</span>
-              <input
-                name="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.amount}
-                onChange={handleChange}
-                placeholder="2500"
-                disabled={!canEnterRemaining}
-              />
-              {errors.amount ? <small className="field-error">{errors.amount}</small> : null}
-            </label>
-
-            <label className="form-grid__full" onMouseDown={(event) => blockIfLocked(!canEnterRemaining, 'Enter a valid IFSC code for the receiver account first.', event)}>
-              <span>Description</span>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                rows="4"
-                placeholder="Optional note for the transaction"
-                disabled={!canEnterRemaining}
-              />
-              <div className="field-meta">
-                <small>{form.description.length}/255 characters</small>
-                {errors.description ? <small className="field-error">{errors.description}</small> : null}
-              </div>
-            </label>
-
-            <label onMouseDown={(event) => blockIfLocked(!canEnterRemaining, 'Enter a valid IFSC code for the receiver account first.', event)}>
-              <span>UPI PIN</span>
-              <input
-                name="upiPin"
-                type="password"
-                inputMode="numeric"
-                maxLength="4"
-                value={form.upiPin}
-                onChange={handleChange}
-                placeholder="1234"
-                disabled={!canEnterRemaining}
-              />
-              {errors.upiPin ? <small className="field-error">{errors.upiPin}</small> : null}
-            </label>
-
-            <div className="form-grid__full button-row">
-              <button type="submit" className="primary-button" disabled={submitting}>
-                {submitting ? 'Submitting...' : 'Send payment'}
-              </button>
-              <button
-                type="button"
-                className="ghost-button"
-                onClick={handleResetForm}
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </SectionCard>
-
-        <SectionCard title="Known customer accounts" subtitle="Useful for demoing against the seeded backend data.">
-          {loadingCustomers ? (
-            <LoadingState label="Loading customers..." />
-          ) : customerOptions.length ? (
-            <div className="list-stack">
-              {customerOptions.map((customer) => (
-                <button
-                  key={customer.value}
-                  type="button"
-                  className="inline-card inline-card--button"
-                  onClick={() => {
-                    setForm((current) => ({
-                      ...current,
-                      senderAccountNumber: customer.value,
-                    }));
-                  }}
-                >
-                  <div>
-                    <strong>{customer.name}</strong>
-                    <p>{customer.bankName}</p>
-                  </div>
-                  <div className="text-right">
-                    <span>{customer.value}</span>
-                    <p>{formatCurrency(customer.balance)}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+          {loadingAccounts ? (
+            <LoadingState label="Loading sender accounts..." />
           ) : (
-            <p className="muted">No customer accounts available yet.</p>
+            <SenderAccountDetails
+              accounts={accounts}
+              selectedAccountNumber={selectedSenderAccountNumber}
+              onSelectAccount={handleSelectSenderAccount}
+            />
           )}
-        </SectionCard>
-      </div>
 
-      <SectionCard title="Latest payment receipt" subtitle="Response from the backend `PaymentResponse` DTO.">
-        {receipt ? (
-          <div className="receipt-grid">
-            <div>
-              <span className="receipt-label">Transaction ID</span>
-              <strong>{receipt.transactionId}</strong>
-            </div>
-            <div>
-              <span className="receipt-label">Status</span>
-              <StatusBadge status={receipt.paymentStatus} />
-            </div>
-            <div>
-              <span className="receipt-label">Amount</span>
-              <strong>{formatCurrency(receipt.amount)}</strong>
-            </div>
-            <div>
-              <span className="receipt-label">Transaction time</span>
-              <strong>{formatDateTime(receipt.transactionTime)}</strong>
-            </div>
-            <div>
-              <span className="receipt-label">Sender</span>
-              <strong>{receipt.senderAccountNumber}</strong>
-            </div>
-            <div>
-              <span className="receipt-label">Receiver</span>
-              <strong>{receipt.receiverAccountNumber}</strong>
-            </div>
-            <div className="receipt-message">
-              <span className="receipt-label">Message</span>
-              <p>{receipt.message}</p>
-            </div>
-          </div>
-        ) : (
-          <p className="muted">Submit a payment to see a confirmation receipt here.</p>
-        )}
-      </SectionCard>
+          <ReceiverDetails
+            receiverAccountNumber={receiverAccountNumber}
+            onReceiverAccountNumberChange={handleReceiverAccountChange}
+            onLookupReceiver={handleLookupReceiver}
+            receiver={receiver}
+            loading={loadingReceiver}
+            disabled={!hasSender}
+          />
+
+          <PaymentPreview
+            amount={amount}
+            onAmountChange={handleAmountChange}
+            onPreview={handlePreviewPayment}
+            preview={preview}
+            isPreviewing={previewing}
+            senderCurrency={senderAccount?.currency}
+            receiverCurrency={receiver?.currency}
+            disabled={!hasSender || !hasReceiver}
+          />
+
+          <PaymentConfirmation
+            upiPin={upiPin}
+            onUpiPinChange={setUpiPin}
+            description={description}
+            onDescriptionChange={setDescription}
+            onSend={handleSendPayment}
+            sending={sending}
+            disabled={!canEnterConfirmation}
+            canSubmit={canSend}
+          />
+
+          <PaymentSuccess result={result} onCreateAnother={handleCreateAnotherPayment} />
+        </div>
+      ) : null}
     </div>
   );
 }
