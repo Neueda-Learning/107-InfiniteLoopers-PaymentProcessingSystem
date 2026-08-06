@@ -31,5 +31,8 @@ public class TransactionResponse {
     private LocalDateTime sentTime;
     private LocalDateTime completedTime;
     private LocalDateTime failedTime;
+
+    /** Human-readable reason for failure. Non-null only when paymentStatus is FAILED. */
+    private String failureReason;
 }
 

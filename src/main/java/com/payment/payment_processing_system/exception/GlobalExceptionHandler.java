@@ -115,7 +115,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidUpiPinException(
             InvalidUpiPinException ex, HttpServletRequest request) {
         log.error("Invalid UPI PIN: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_UPI_PIN, ex.getMessage(), request);
+        return buildFailedPaymentErrorResponse(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_UPI_PIN,
+                ex.getMessage(), request, ex.getTransactionId());
     }
 
     // ─── 409 Conflict ─────────────────────────────────────────────────────────
@@ -133,14 +134,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInsufficientBalanceException(
             InsufficientBalanceException ex, HttpServletRequest request) {
         log.error("Insufficient balance: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.INSUFFICIENT_FUNDS, ex.getMessage(), request);
+        return buildFailedPaymentErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.INSUFFICIENT_FUNDS,
+                ex.getMessage(), request, ex.getTransactionId());
     }
 
     @ExceptionHandler(DailyTransactionLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleDailyTransactionLimitExceededException(
             DailyTransactionLimitExceededException ex, HttpServletRequest request) {
         log.error("Daily transaction limit exceeded: {}", ex.getMessage());
-        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.DAILY_TRANSACTION_LIMIT_EXCEEDED, ex.getMessage(), request);
+        return buildFailedPaymentErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.DAILY_TRANSACTION_LIMIT_EXCEEDED,
+                ex.getMessage(), request, ex.getTransactionId());
     }
 
     // ─── 429 Too Many Requests ────────────────────────────────────────────────
@@ -190,6 +193,28 @@ public class GlobalExceptionHandler {
                 .errorCode(errorCode)
                 .message(message)
                 .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    /**
+     * Builds an error response that also includes a transactionId.
+     * Used for payment validation failures (balance, daily limit, UPI PIN) where
+     * a FAILED transaction was already persisted before the validation threw.
+     */
+    private ResponseEntity<ErrorResponse> buildFailedPaymentErrorResponse(
+            HttpStatus status, ErrorCode errorCode, String message,
+            HttpServletRequest request, String transactionId) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .errorCode(errorCode)
+                .message(message)
+                .path(request.getRequestURI())
+                .transactionId(transactionId)
                 .build();
 
         return ResponseEntity.status(status).body(errorResponse);

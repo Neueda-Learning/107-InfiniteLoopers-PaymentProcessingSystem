@@ -136,5 +136,22 @@ public class SupportServiceImpl implements SupportService {
                 .map(transactionMapper::toTransactionResponse)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Returns all FAILED transactions sorted by failedTime descending.
+     * Each entry includes the failure reason stored at the time of failure.
+     */
+    @Override
+    public List<TransactionResponse> getAuditTrail() {
+        log.info("Fetching failed transaction audit trail");
+
+        return paymentTransactionRepository.findByPaymentStatus(PaymentStatus.FAILED)
+                .stream()
+                .sorted(Comparator.comparing(
+                        tx -> tx.getFailedTime() != null ? tx.getFailedTime() : tx.getCreatedTime(),
+                        Comparator.reverseOrder()))
+                .map(transactionMapper::toTransactionResponse)
+                .collect(Collectors.toList());
+    }
 }
 
