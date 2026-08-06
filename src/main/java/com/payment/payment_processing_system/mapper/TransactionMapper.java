@@ -34,6 +34,7 @@ public class TransactionMapper {
                 .sentTime(transaction.getSentTime())
                 .completedTime(transaction.getCompletedTime())
                 .failedTime(transaction.getFailedTime())
+                .failureReason(transaction.getFailureReason())
                 .build();
     }
 }

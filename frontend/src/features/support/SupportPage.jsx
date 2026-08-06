@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getSupportTransactions, getSupportTransactionsByCustomer } from '../../api/supportApi';
+import { getSupportTransactions, getSupportTransactionsByCustomer, getAuditTrail } from '../../api/supportApi';
 import {
   getCustomerById,
   getCustomerAccounts,
@@ -66,6 +66,35 @@ function getTransactionBaseCurrency(transaction) {
   return transaction.senderCurrency || transaction.receiverCurrency || 'INR';
 }
 
+function isUpiFailure(reason) {
+  if (!reason) return false;
+  return /upi|pin|authentication/i.test(reason);
+}
+
+function isBalanceFailure(reason) {
+  if (!reason) return false;
+  return /balance|insufficient/i.test(reason);
+}
+
+function isDailyLimitFailure(reason) {
+  if (!reason) return false;
+  return /daily|limit/i.test(reason);
+}
+
+function getFailureBadgeClass(reason) {
+  if (isUpiFailure(reason)) return 'audit-reason-badge--pin';
+  if (isBalanceFailure(reason)) return 'audit-reason-badge--balance';
+  if (isDailyLimitFailure(reason)) return 'audit-reason-badge--limit';
+  return 'audit-reason-badge--other';
+}
+
+function getFailureCategoryLabel(reason) {
+  if (isUpiFailure(reason)) return 'Wrong PIN';
+  if (isBalanceFailure(reason)) return 'Insufficient Balance';
+  if (isDailyLimitFailure(reason)) return 'Daily Limit Exceeded';
+  return 'Failed';
+}
+
 export function SupportPage() {
   const [activeTab, setActiveTab] = useState('transactions');
   const [customerOptions, setCustomerOptions] = useState([]);
@@ -82,6 +111,9 @@ export function SupportPage() {
   const [selectedCustomerAccounts, setSelectedCustomerAccounts] = useState([]);
   const [selectedCustomerTransactions, setSelectedCustomerTransactions] = useState([]);
 
+  const [auditEntries, setAuditEntries] = useState([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+
   const selectedAccountNumbers = useMemo(
     () => new Set(selectedCustomerAccounts.map((account) => account.accountNumber)),
     [selectedCustomerAccounts],
@@ -94,6 +126,24 @@ export function SupportPage() {
     }, {}),
     [selectedCustomerAccounts],
   );
+
+  const transactionStatusSummary = useMemo(() => {
+    const successful = transactions.filter((item) => item.paymentStatus === 'COMPLETED').length;
+    const failed = transactions.filter((item) => item.paymentStatus === 'FAILED').length;
+    const other = Math.max(transactions.length - successful - failed, 0);
+    const total = successful + failed + other;
+    const safeTotal = total || 1;
+
+    return {
+      successful,
+      failed,
+      other,
+      total,
+      successPercent: Math.round((successful / safeTotal) * 100),
+      failedPercent: Math.round((failed / safeTotal) * 100),
+      otherPercent: Math.max(100 - Math.round((successful / safeTotal) * 100) - Math.round((failed / safeTotal) * 100), 0),
+    };
+  }, [transactions]);
 
   const customerAnalytics = useMemo(() => {
     const totalBalanceByCurrency = {};
@@ -241,6 +291,40 @@ export function SupportPage() {
     };
   }, [activeTab, selectedCustomerId]);
 
+  useEffect(() => {
+    if (activeTab !== 'audit') {
+      return;
+    }
+
+    let active = true;
+
+    async function loadAuditTrail() {
+      setAuditLoading(true);
+      setError('');
+
+      try {
+        const data = await getAuditTrail();
+        if (active) {
+          setAuditEntries(data);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'Unable to load audit trail.');
+        }
+      } finally {
+        if (active) {
+          setAuditLoading(false);
+        }
+      }
+    }
+
+    loadAuditTrail();
+
+    return () => {
+      active = false;
+    };
+  }, [activeTab]);
+
   async function handleTransactionCustomerFilterChange(event) {
     const customerId = event.target.value;
     setTransactionCustomerFilter(customerId);
@@ -371,6 +455,42 @@ export function SupportPage() {
             </label>
           </div>
 
+          <div className="support-transaction-visual" role="status" aria-live="polite">
+            <div className="support-transaction-visual__head">
+              <p className="detail-label">Successful vs Failed transactions</p>
+              <strong>{transactionStatusSummary.successPercent}% success rate</strong>
+            </div>
+            <div className="support-transaction-split" aria-hidden="true">
+              <span
+                className="support-transaction-split__part support-transaction-split__part--success"
+                style={{ width: `${transactionStatusSummary.successPercent}%` }}
+              />
+              <span
+                className="support-transaction-split__part support-transaction-split__part--failed"
+                style={{ width: `${transactionStatusSummary.failedPercent}%` }}
+              />
+              <span
+                className="support-transaction-split__part support-transaction-split__part--other"
+                style={{ width: `${transactionStatusSummary.otherPercent}%` }}
+              />
+            </div>
+            <div className="support-transaction-legend">
+              <span>
+                <i className="support-legend-dot support-legend-dot--success" aria-hidden="true" />
+                {transactionStatusSummary.successful} successful
+              </span>
+              <span>
+                <i className="support-legend-dot support-legend-dot--failed" aria-hidden="true" />
+                {transactionStatusSummary.failed} failed
+              </span>
+              <span>
+                <i className="support-legend-dot support-legend-dot--other" aria-hidden="true" />
+                {transactionStatusSummary.other} other
+              </span>
+              <span>{transactionStatusSummary.total} total</span>
+            </div>
+          </div>
+
           {transactionsLoading ? (
             <LoadingState label="Refreshing transactions..." />
           ) : (
@@ -396,6 +516,13 @@ export function SupportPage() {
                     key: 'paymentStatus',
                     label: 'Status',
                     render: (transaction) => <StatusBadge status={transaction.paymentStatus} />,
+                  },
+                  {
+                    key: 'failureReason',
+                    label: 'Failure Reason',
+                    render: (transaction) => transaction.failureReason
+                      ? <span className="audit-inline-reason">{transaction.failureReason}</span>
+                      : <span className="muted">—</span>,
                   },
                   {
                     key: 'transactionDate',
@@ -583,9 +710,81 @@ export function SupportPage() {
       ) : null}
 
       {!loading && activeTab === 'audit' ? (
-        <SectionCard title="Audit Trail">
-          <EmptyState title="Audit trail coming soon" description="This section will host support audit events and timeline views." />
-        </SectionCard>
+        <>
+          <SectionCard
+            title="Audit Trail"
+            subtitle="Failed transactions with failure reasons. Covers incorrect UPI PIN, insufficient balance, and daily limit breaches."
+          >
+            {auditLoading ? (
+              <LoadingState label="Loading audit trail..." />
+            ) : auditEntries.length === 0 ? (
+              <EmptyState
+                title="No failed transactions"
+                description="All transactions have completed successfully. Failed transactions will appear here with their failure reasons."
+              />
+            ) : (
+              <>
+                <div className="audit-summary-strip">
+                  <div className="audit-summary-item audit-summary-item--failed">
+                    <span>{auditEntries.length}</span>
+                    <p>Total failed</p>
+                  </div>
+                  <div className="audit-summary-item audit-summary-item--pin">
+                    <span>{auditEntries.filter((e) => isUpiFailure(e.failureReason)).length}</span>
+                    <p>Wrong PIN</p>
+                  </div>
+                  <div className="audit-summary-item audit-summary-item--balance">
+                    <span>{auditEntries.filter((e) => isBalanceFailure(e.failureReason)).length}</span>
+                    <p>Insufficient balance</p>
+                  </div>
+                  <div className="audit-summary-item audit-summary-item--limit">
+                    <span>{auditEntries.filter((e) => isDailyLimitFailure(e.failureReason)).length}</span>
+                    <p>Daily limit exceeded</p>
+                  </div>
+                </div>
+
+                <div className="audit-trail-list">
+                  {auditEntries.map((entry) => (
+                    <article key={entry.transactionId} className="audit-entry">
+                      <div className="audit-entry__header">
+                        <div className="audit-entry__id">
+                          <span className="detail-label">Transaction ID</span>
+                          <strong>{entry.transactionId}</strong>
+                        </div>
+                        <span className={`audit-reason-badge ${getFailureBadgeClass(entry.failureReason)}`}>
+                          {getFailureCategoryLabel(entry.failureReason)}
+                        </span>
+                      </div>
+
+                      <p className="audit-entry__reason">
+                        {entry.failureReason || 'No failure reason recorded.'}
+                      </p>
+
+                      <div className="audit-entry__meta">
+                        <span>
+                          <span className="detail-label">Amount</span>{' '}
+                          {formatCurrency(entry.amount, entry.senderCurrency)}
+                        </span>
+                        <span>
+                          <span className="detail-label">Sender</span>{' '}
+                          {entry.senderAccountNumber}
+                        </span>
+                        <span>
+                          <span className="detail-label">Receiver</span>{' '}
+                          {entry.receiverAccountNumber}
+                        </span>
+                        <span>
+                          <span className="detail-label">Failed at</span>{' '}
+                          {formatDateTime(entry.failedTime || entry.createdTime)}
+                        </span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </SectionCard>
+        </>
       ) : null}
     </div>
   );

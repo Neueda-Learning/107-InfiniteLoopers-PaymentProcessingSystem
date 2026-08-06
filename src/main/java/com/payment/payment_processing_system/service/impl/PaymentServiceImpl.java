@@ -27,6 +27,7 @@ import com.payment.payment_processing_system.service.CurrencyConversionService;
 import com.payment.payment_processing_system.service.PaymentService;
 import com.payment.payment_processing_system.validation.AccountValidator;
 import com.payment.payment_processing_system.validation.BalanceValidator;
+import com.payment.payment_processing_system.validation.DailyTransactionLimitValidator;
 import com.payment.payment_processing_system.validation.PaymentValidator;
 import com.payment.payment_processing_system.validation.RetryValidator;
 import com.payment.payment_processing_system.validation.StatusTransitionValidator;
@@ -65,6 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentValidator paymentValidator;
     private final AccountValidator accountValidator;
     private final BalanceValidator balanceValidator;
+    private final DailyTransactionLimitValidator dailyTransactionLimitValidator;
     private final CurrencyConversionService currencyConversionService;
     private final RetryValidator retryValidator;
     private final StatusTransitionValidator statusTransitionValidator;
@@ -74,7 +76,11 @@ public class PaymentServiceImpl implements PaymentService {
      * CREATED → VALIDATED → SENT → COMPLETED (or FAILED at any point)
      */
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = {
+        InvalidUpiPinException.class,
+        InsufficientBalanceException.class,
+        DailyTransactionLimitExceededException.class
+    })
     public PaymentResponse sendMoney(PaymentRequest request) {
         return sendMoney(request, null);
     }
@@ -84,7 +90,11 @@ public class PaymentServiceImpl implements PaymentService {
      * idempotency key for safe retries.
      */
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = {
+        InvalidUpiPinException.class,
+        InsufficientBalanceException.class,
+        DailyTransactionLimitExceededException.class
+    })
     public PaymentResponse sendMoney(PaymentRequest request, String idempotencyKey) {
         PaymentTransaction transaction = null;
 
@@ -131,18 +141,11 @@ public class PaymentServiceImpl implements PaymentService {
 
             BigDecimal totalDeducted = request.getAmount().add(transferCharge);
 
-            // Step 5: Validate sender balance (requires DB data)
-            balanceValidator.validateBalance(senderAccount, totalDeducted);
-
-            // Step 6: Validate UPI PIN against stored value (requires DB data)
-            if (!senderAccount.getUpiPin().equals(request.getUpiPin())) {
-                throw new InvalidUpiPinException("Invalid UPI PIN. Authentication failed.");
-            }
-
-            // Step 7 & 8: Generate unique transactionId and persist the resolved idempotency key
+            // Step 4: Generate transaction ID and persist the transaction as CREATED
+            // IMPORTANT: transaction must exist in DB before validations so that any
+            // validation failure (balance / daily-limit / UPI PIN) can be recorded as FAILED.
             String transactionId = generateTransactionId();
 
-            // Step 9: Create PaymentTransaction with status CREATED
             transaction = PaymentTransaction.builder()
                     .transactionId(transactionId)
                     .senderAccount(senderAccount)
@@ -173,7 +176,28 @@ public class PaymentServiceImpl implements PaymentService {
             recordStatusHistory(transaction, PaymentStatus.CREATED);
             log.info("Transaction created: {}", transactionId);
 
-            // Step 10: Validate payment → status VALIDATED
+            // Step 5: Validate sender balance — failure marks this transaction FAILED
+            try {
+                balanceValidator.validateBalance(senderAccount, totalDeducted);
+            } catch (InsufficientBalanceException ex) {
+                throw new InsufficientBalanceException(ex.getMessage(), transactionId);
+            }
+
+            // Step 5.1: Validate daily transaction limit — failure marks this transaction FAILED
+            try {
+                dailyTransactionLimitValidator.validateDailyLimit(senderAccount, request.getAmount());
+            } catch (DailyTransactionLimitExceededException ex) {
+                throw new DailyTransactionLimitExceededException(ex.getMessage(), transactionId);
+            }
+
+            // Step 6: Validate UPI PIN — failure marks this transaction FAILED
+            if (!senderAccount.getUpiPin().equals(request.getUpiPin())) {
+                throw new InvalidUpiPinException("Invalid UPI PIN. Authentication failed.", transactionId);
+            }
+
+            // Step 7: Generate unique transactionId — already done above (Step 4)
+
+            // Step 8: Validate payment → status VALIDATED
             statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.VALIDATED);
             transaction.setPaymentStatus(PaymentStatus.VALIDATED);
             transaction.setValidatedTime(LocalDateTime.now());
@@ -181,13 +205,13 @@ public class PaymentServiceImpl implements PaymentService {
             recordStatusHistory(transaction, PaymentStatus.VALIDATED);
             log.info("Transaction validated: {}", transactionId);
 
-            // Step 11: Deduct sender balance and credit receiver balance
+            // Step 9: Deduct sender balance and credit receiver balance
             senderAccount.setBalance(senderAccount.getBalance().subtract(totalDeducted));
             receiverAccount.setBalance(receiverAccount.getBalance().add(convertedAmount));
             accountRepository.save(senderAccount);
             accountRepository.save(receiverAccount);
 
-            // Step 12: Status → SENT
+            // Step 10: Status → SENT
             statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.SENT);
             transaction.setPaymentStatus(PaymentStatus.SENT);
             transaction.setSentTime(LocalDateTime.now());
@@ -195,7 +219,7 @@ public class PaymentServiceImpl implements PaymentService {
             recordStatusHistory(transaction, PaymentStatus.SENT);
             log.info("Transaction sent: {}", transactionId);
 
-            // Step 13: Status → COMPLETED
+            // Step 11: Status → COMPLETED
             statusTransitionValidator.validate(transactionId, transaction.getPaymentStatus(), PaymentStatus.COMPLETED);
             transaction.setPaymentStatus(PaymentStatus.COMPLETED);
             transaction.setCompletedTime(LocalDateTime.now());
@@ -203,7 +227,7 @@ public class PaymentServiceImpl implements PaymentService {
             recordStatusHistory(transaction, PaymentStatus.COMPLETED);
             log.info("Transaction completed: {}", transactionId);
 
-            // Step 14: Send email notification for high-value transactions (amount > 10000)
+            // Step 12: Send email notification for high-value transactions (amount > 10000)
             if (request.getAmount().compareTo(HIGH_VALUE_THRESHOLD) > 0) {
                 try {
                     String senderEmail = senderAccount.getCustomer().getEmail();
@@ -232,14 +256,14 @@ public class PaymentServiceImpl implements PaymentService {
                 | RetryLimitExceededException ex) {
             log.error("Payment failed during validation [{}]: {}", ex.getClass().getSimpleName(), ex.getMessage());
             if (transaction != null) {
-                markAsFailed(transaction);
+                markAsFailed(transaction, buildFailureReason(ex));
             }
             throw ex;
 
         } catch (Exception ex) {
             log.error("Unexpected error during payment processing: {}", ex.getMessage(), ex);
             if (transaction != null) {
-                markAsFailed(transaction);
+                markAsFailed(transaction, "An unexpected error occurred during payment processing.");
             }
             throw ex;
         }
@@ -277,7 +301,11 @@ public class PaymentServiceImpl implements PaymentService {
      * All retry rules are enforced by RetryValidator.
      */
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = {
+        InvalidUpiPinException.class,
+        InsufficientBalanceException.class,
+        DailyTransactionLimitExceededException.class
+    })
     public PaymentResponse retryPayment(String transactionId) {
         PaymentTransaction original = paymentTransactionRepository.findByTransactionId(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException(
@@ -538,17 +566,44 @@ public class PaymentServiceImpl implements PaymentService {
      * Marks a transaction as FAILED and records a history entry.
      */
     private void markAsFailed(PaymentTransaction transaction) {
+        markAsFailed(transaction, null);
+    }
+
+    /**
+     * Marks a transaction as FAILED with a human-readable failure reason, and records a history entry.
+     */
+    private void markAsFailed(PaymentTransaction transaction, String failureReason) {
         try {
             statusTransitionValidator.validate(
                     transaction.getTransactionId(), transaction.getPaymentStatus(), PaymentStatus.FAILED);
             transaction.setPaymentStatus(PaymentStatus.FAILED);
             transaction.setFailedTime(LocalDateTime.now());
+            transaction.setFailureReason(failureReason);
             paymentTransactionRepository.save(transaction);
             recordStatusHistory(transaction, PaymentStatus.FAILED);
-            log.info("Transaction marked as FAILED: {}", transaction.getTransactionId());
+            log.info("Transaction marked as FAILED: {} | Reason: {}", transaction.getTransactionId(), failureReason);
         } catch (Exception e) {
             log.error("Failed to update transaction status to FAILED: {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * Returns a concise, user-friendly failure reason for audit trail display.
+     */
+    private String buildFailureReason(Exception ex) {
+        if (ex instanceof InvalidUpiPinException) {
+            return "Incorrect UPI PIN. Authentication failed.";
+        }
+        if (ex instanceof InsufficientBalanceException) {
+            return "Insufficient account balance to complete this transaction.";
+        }
+        if (ex instanceof DailyTransactionLimitExceededException) {
+            return "Daily transaction limit of \u20B91,00,000 exceeded for this account.";
+        }
+        if (ex instanceof AccountNotFoundException) {
+            return "Account not found: " + ex.getMessage();
+        }
+        return ex.getMessage() != null ? ex.getMessage() : "Unknown error.";
     }
 
     /**

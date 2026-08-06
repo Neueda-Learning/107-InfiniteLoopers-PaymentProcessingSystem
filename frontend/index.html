@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PayPilot</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      (function () {
+        var t = localStorage.getItem('paypilot-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
     <meta
       name="description"
       content="Frontend dashboard for payment processing, customer management, and support operations."

@@ -1,21 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAllCustomers } from '../../api/customerApi';
 import { getAllTransactions } from '../../api/paymentApi';
 import { getSupportDashboard } from '../../api/supportApi';
 import {
-  DataTable,
-  EmptyState,
   ErrorAlert,
   LoadingState,
   PageHeader,
-  SectionCard,
-  StatusBadge,
   StatCard,
 } from '../../components/UI';
 import {
   formatCurrency,
-  formatDateTime,
-  getEffectiveTransactionTime,
 } from '../../utils/formatters';
 
 export function OverviewPage() {
@@ -63,121 +58,80 @@ export function OverviewPage() {
     };
   }, []);
 
-  const recentTransactions = useMemo(() => {
-    return [...transactions]
-      .sort((left, right) => {
-        const leftTime = new Date(getEffectiveTransactionTime(left) || 0).getTime();
-        const rightTime = new Date(getEffectiveTransactionTime(right) || 0).getTime();
-        return rightTime - leftTime;
-      })
-      .slice(0, 5);
-  }, [transactions]);
+  const overviewMetrics = useMemo(() => {
+    const totalCustomers = Number(dashboard?.totalCustomers ?? customers.length ?? 0);
+    const totalTransactions = Number(dashboard?.totalTransactions ?? transactions.length ?? 0);
+    const successfulTransactions = Number(
+      dashboard?.successfulTransactions
+        ?? transactions.filter((item) => item.paymentStatus === 'COMPLETED').length,
+    );
+    const failedTransactions = Number(
+      dashboard?.failedTransactions
+        ?? transactions.filter((item) => item.paymentStatus === 'FAILED').length,
+    );
+
+    const averageAmount = transactions.length
+      ? transactions.reduce((sum, item) => sum + Number(item.amount || 0), 0) / transactions.length
+      : 0;
+
+    return {
+      totalCustomers,
+      totalTransactions,
+      successfulTransactions,
+      failedTransactions,
+      averageAmount,
+    };
+  }, [customers, dashboard, transactions]);
 
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Operational dashboard"
+        eyebrow="Dashboard"
         title="Overview"
-        description="Monitor the payment system, inspect recent activity, and use the seeded customer accounts for quick demos."
+        description="A summary of your payment activity. See how your transactions are performing and take action from here."
       />
 
       <ErrorAlert message={error} onDismiss={() => setError('')} />
 
       {loading ? (
-        <LoadingState label="Loading overview metrics and recent activity..." />
+        <LoadingState label="Loading your dashboard..." />
       ) : (
         <>
+          <section className="overview-hero" aria-label="Overview hero">
+            <div>
+              <p className="overview-hero__eyebrow">Welcome to PayPilot</p>
+              <h2>Your payments, all in one place.</h2>
+              <p className="muted">
+                Send payments, check transaction status, and get support — all from this dashboard.
+              </p>
+              <div className="overview-hero__actions">
+                <Link to="/payments" className="primary-button">Make a Payment</Link>
+                <Link to="/support" className="secondary-button">View Support</Link>
+              </div>
+            </div>
+          </section>
+
           <div className="stats-grid">
-            <StatCard label="Total customers" value={dashboard?.totalCustomers ?? customers.length} />
-            <StatCard label="Total transactions" value={dashboard?.totalTransactions ?? transactions.length} />
+            <StatCard label="Registered Customers" value={overviewMetrics.totalCustomers} />
+            <StatCard label="Total Transactions" value={overviewMetrics.totalTransactions} />
             <StatCard
-              label="Successful transactions"
-              value={dashboard?.successfulTransactions ?? '—'}
+              label="Successful Transactions"
+              value={overviewMetrics.successfulTransactions}
               tone="success"
             />
             <StatCard
-              label="Failed transactions"
-              value={dashboard?.failedTransactions ?? '—'}
+              label="Average Transfer Amount"
+              value={formatCurrency(overviewMetrics.averageAmount)}
+            />
+            <StatCard
+              label="Failed Transactions"
+              value={overviewMetrics.failedTransactions}
               tone="danger"
             />
-            <StatCard
-              label="Total credit"
-              value={formatCurrency(dashboard?.totalCreditAmount)}
-              tone="info"
-            />
-            <StatCard
-              label="Total debit"
-              value={formatCurrency(dashboard?.totalDebitAmount)}
-              tone="warning"
-            />
           </div>
 
-          <div className="content-grid content-grid--2col">
-            <SectionCard
-              title="Quick start"
-              subtitle="The backend ships with sample records, so you can test flows immediately."
-            >
-              <ul className="bullet-list">
-                <li>Alice Johnson — account <strong>100000000001</strong>, IFSC <strong>SBIN0001234</strong></li>
-                <li>Bob Smith — account <strong>100000000002</strong>, IFSC <strong>HDFC0005678</strong></li>
-                <li>Try a payment from Alice to Bob using UPI PIN <strong>1234</strong></li>
-                <li>Use the Transactions page to retry the seeded failed transaction</li>
-              </ul>
-            </SectionCard>
-
-            <SectionCard title="Customers in system" subtitle="Fetched from `/api/customers`.">
-              {customers.length ? (
-                <div className="list-stack">
-                  {customers.map((customer) => (
-                    <div key={customer.customerId} className="inline-card">
-                      <div>
-                        <strong>{customer.customerName}</strong>
-                        <p>{customer.bankName}</p>
-                      </div>
-                      <div className="text-right">
-                        <span>{customer.accountNumber}</span>
-                        <p>{formatCurrency(customer.balance)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState title="No customers returned" description="Check backend seed data or MySQL startup." />
-              )}
-            </SectionCard>
-          </div>
-
-          <SectionCard title="Recent transactions" subtitle="Latest payment activity from `/api/payments`.">
-            <DataTable
-              rowKey={(transaction) => transaction.transactionId}
-              rows={recentTransactions}
-              columns={[
-                { key: 'transactionId', label: 'Transaction ID' },
-                { key: 'senderAccountNumber', label: 'Sender' },
-                { key: 'receiverAccountNumber', label: 'Receiver' },
-                {
-                  key: 'amount',
-                  label: 'Amount',
-                  render: (transaction) => formatCurrency(transaction.amount),
-                },
-                {
-                  key: 'createdTime',
-                  label: 'Latest time',
-                  render: (transaction) => formatDateTime(getEffectiveTransactionTime(transaction)),
-                },
-                {
-                  key: 'paymentStatus',
-                  label: 'Status',
-                  render: (transaction) => <StatusBadge status={transaction.paymentStatus} />,
-                },
-              ]}
-              empty={<EmptyState title="No transactions yet" description="Create or retry a payment to populate the table." />}
-            />
-          </SectionCard>
         </>
       )}
     </div>
   );
 }
-
-
