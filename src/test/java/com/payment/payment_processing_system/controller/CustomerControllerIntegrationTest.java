@@ -2,8 +2,11 @@ package com.payment.payment_processing_system.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.payment.payment_processing_system.dto.CustomerAccountResponse;
+import com.payment.payment_processing_system.dto.CustomerListItemResponse;
 import com.payment.payment_processing_system.dto.CustomerResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.exception.AccountNotFoundException;
 import com.payment.payment_processing_system.exception.CustomerNotFoundException;
 import com.payment.payment_processing_system.exception.TransactionNotFoundException;
@@ -40,17 +43,8 @@ class CustomerControllerIntegrationTest {
     @Test
     @DisplayName("GET /api/customers should return all customers")
     void getAllCustomers_shouldReturnList() throws Exception {
-        List<CustomerResponse> response = List.of(
-                CustomerResponse.builder()
-                        .customerId(1L)
-                        .customerName("Alice")
-                        .email("alice@example.com")
-                        .phoneNumber("9999999999")
-                        .accountNumber("100000000001")
-                        .ifscCode("HDFC0005678")
-                        .bankName("HDFC")
-                        .balance(new BigDecimal("50000.00"))
-                        .build()
+        List<CustomerListItemResponse> response = List.of(
+                new CustomerListItemResponse(1L, "Alice")
         );
 
         when(customerService.getAllCustomers()).thenReturn(response);
@@ -61,8 +55,132 @@ class CustomerControllerIntegrationTest {
         assertThat(httpResponse.statusCode()).isEqualTo(200);
         assertThat(body.isArray()).isTrue();
         assertThat(body).hasSize(1);
-        assertThat(body.get(0).path("customerId").asLong()).isEqualTo(1L);
+        assertThat(body.get(0).path("id").asLong()).isEqualTo(1L);
+        assertThat(body.get(0).path("customerName").asText()).isEqualTo("Alice");
+        assertThat(body.get(0).has("email")).isFalse();
+        assertThat(body.get(0).has("phoneNumber")).isFalse();
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/{customerId}/accounts should return active accounts")
+    void getCustomerAccounts_shouldReturnActiveAccounts() throws Exception {
+        List<CustomerAccountResponse> response = List.of(
+                new CustomerAccountResponse(
+                        10L,
+                        "100000000001",
+                        "HDFC",
+                        "HDFC0005678",
+                        new BigDecimal("50000.00"),
+                        CurrencyType.INR,
+                        true
+                )
+        );
+
+        when(customerService.getActiveAccountsByCustomerId(1L)).thenReturn(response);
+
+        HttpResponse<String> httpResponse = get("/api/customers/1/accounts");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(body.isArray()).isTrue();
+        assertThat(body).hasSize(1);
+        assertThat(body.get(0).path("accountId").asLong()).isEqualTo(10L);
         assertThat(body.get(0).path("accountNumber").asText()).isEqualTo("100000000001");
+        assertThat(body.get(0).path("currency").asText()).isEqualTo("INR");
+        assertThat(body.get(0).path("isActive").asBoolean()).isTrue();
+        assertThat(body.get(0).has("upiPin")).isFalse();
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/{customerId}/accounts should return 404 when customer is missing")
+    void getCustomerAccounts_whenCustomerMissing_shouldReturnNotFound() throws Exception {
+        when(customerService.getActiveAccountsByCustomerId(404L))
+                .thenThrow(new CustomerNotFoundException("Customer not found with ID: 404"));
+
+        HttpResponse<String> httpResponse = get("/api/customers/404/accounts");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(404);
+        assertThat(body.path("errorCode").asText()).isEqualTo("CUSTOMER_NOT_FOUND");
+        assertThat(body.path("message").asText()).isEqualTo("Customer not found with ID: 404");
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/{customerId}/accounts should return 400 for invalid customer ID")
+    void getCustomerAccounts_whenInvalidCustomerId_shouldReturnBadRequest() throws Exception {
+        HttpResponse<String> httpResponse = get("/api/customers/abc/accounts");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(400);
+        assertThat(body.path("errorCode").asText()).isEqualTo("VALIDATION_FAILED");
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/accounts should return active accounts by email")
+    void getCustomerAccountsByIdentifier_shouldReturnActiveAccounts() throws Exception {
+        List<CustomerAccountResponse> response = List.of(
+                new CustomerAccountResponse(
+                        10L,
+                        "100000000001",
+                        "HDFC",
+                        "HDFC0005678",
+                        new BigDecimal("50000.00"),
+                        CurrencyType.USD,
+                        true
+                )
+        );
+
+        when(customerService.getActiveAccountsByCustomerIdentifier(null, "alice@example.com", null)).thenReturn(response);
+
+        HttpResponse<String> httpResponse = get("/api/customers/accounts?email=alice@example.com");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(body.isArray()).isTrue();
+        assertThat(body).hasSize(1);
+        assertThat(body.get(0).path("accountId").asLong()).isEqualTo(10L);
+        assertThat(body.get(0).path("currency").asText()).isEqualTo("USD");
+        assertThat(body.get(0).path("upiPin").isMissingNode()).isTrue();
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/accounts should return 400 when identifier is missing")
+    void getCustomerAccountsByIdentifier_whenIdentifierMissing_shouldReturnBadRequest() throws Exception {
+        when(customerService.getActiveAccountsByCustomerIdentifier(null, null, null))
+                .thenThrow(new IllegalArgumentException("Provide at least one identifier: customerName, email, or phoneNumber"));
+
+        HttpResponse<String> httpResponse = get("/api/customers/accounts");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(400);
+        assertThat(body.path("errorCode").asText()).isEqualTo("VALIDATION_FAILED");
+    }
+
+    @Test
+    @DisplayName("GET /api/customers/accounts should use priority (email > phone > name) when multiple identifiers provided")
+    void getCustomerAccountsByIdentifier_withMultipleIdentifiers_shouldUsePriority() throws Exception {
+        List<CustomerAccountResponse> response = List.of(
+                new CustomerAccountResponse(
+                        10L,
+                        "100000000001",
+                        "HDFC",
+                        "HDFC0005678",
+                        new BigDecimal("50000.00"),
+                        CurrencyType.GBP,
+                        true
+                )
+        );
+
+        when(customerService.getActiveAccountsByCustomerIdentifier("David Miller", "david@example.com", "9876506234"))
+                .thenReturn(response);
+
+        HttpResponse<String> httpResponse = get("/api/customers/accounts?customerName=David%20Miller&email=david@example.com&phoneNumber=9876506234");
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(body.isArray()).isTrue();
+        assertThat(body).hasSize(1);
+        assertThat(body.get(0).path("currency").asText()).isEqualTo("GBP");
     }
 
     @Test
@@ -77,6 +195,7 @@ class CustomerControllerIntegrationTest {
                 .ifscCode("HDFC0005678")
                 .bankName("HDFC")
                 .balance(new BigDecimal("50000.00"))
+                .currency(CurrencyType.INR)
                 .build();
 
         when(customerService.getCustomerById(1L)).thenReturn(response);
@@ -87,6 +206,7 @@ class CustomerControllerIntegrationTest {
         assertThat(httpResponse.statusCode()).isEqualTo(200);
         assertThat(body.path("customerId").asLong()).isEqualTo(1L);
         assertThat(body.path("customerName").asText()).isEqualTo("Alice");
+        assertThat(body.path("currency").asText()).isEqualTo("INR");
     }
 
     @Test
@@ -116,6 +236,7 @@ class CustomerControllerIntegrationTest {
                 .ifscCode("HDFC0005678")
                 .bankName("HDFC")
                 .balance(new BigDecimal("30000.00"))
+                .currency(CurrencyType.EUR)
                 .build();
 
         when(customerService.getCustomerByAccountNumber("100000000002")).thenReturn(response);
@@ -126,6 +247,7 @@ class CustomerControllerIntegrationTest {
         assertThat(httpResponse.statusCode()).isEqualTo(200);
         assertThat(body.path("customerId").asLong()).isEqualTo(2L);
         assertThat(body.path("accountNumber").asText()).isEqualTo("100000000002");
+        assertThat(body.path("currency").asText()).isEqualTo("EUR");
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.payment.payment_processing_system.mapper;
 
 import com.payment.payment_processing_system.dto.CustomerResponse;
+import com.payment.payment_processing_system.enums.CurrencyType;
 import com.payment.payment_processing_system.model.Account;
 import com.payment.payment_processing_system.model.Customer;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,7 @@ class CustomerMapperTest {
         account.setIfscCode("SBIN0001234");
         account.setBankName("State Bank of India");
         account.setBalance(new BigDecimal("50000.00"));
+        account.setCurrency(CurrencyType.INR);
 
         CustomerResponse response = customerMapper.toCustomerResponse(customer, account);
 
@@ -41,6 +43,7 @@ class CustomerMapperTest {
         assertEquals("SBIN0001234", response.getIfscCode());
         assertEquals("State Bank of India", response.getBankName());
         assertEquals(new BigDecimal("50000.00"), response.getBalance());
+        assertEquals(CurrencyType.INR, response.getCurrency());
     }
 
     @Test
@@ -63,6 +66,7 @@ class CustomerMapperTest {
         assertEquals(null, response.getIfscCode());
         assertEquals(null, response.getBankName());
         assertEquals(null, response.getBalance());
+        assertEquals(null, response.getCurrency());
     }
 }
 

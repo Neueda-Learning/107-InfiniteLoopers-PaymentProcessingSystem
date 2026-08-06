@@ -34,6 +34,11 @@ class PaymentIdempotencyIntegrationTests {
 
     @AfterEach
     void cleanupTestData() {
+        jdbcTemplate.update(
+                "DELETE FROM transaction_status_history WHERE transaction_id IN (" +
+                        "SELECT id FROM payment_transactions WHERE description LIKE ?)",
+                TEST_DESCRIPTION_PREFIX + "%"
+        );
         jdbcTemplate.update("DELETE FROM payment_transactions WHERE description LIKE ?", TEST_DESCRIPTION_PREFIX + "%");
         jdbcTemplate.update("UPDATE accounts SET balance = ? WHERE account_number = ?", new BigDecimal("50000.0000"), "100000000001");
         jdbcTemplate.update("UPDATE accounts SET balance = ? WHERE account_number = ?", new BigDecimal("30000.0000"), "100000000002");

@@ -1,5 +1,7 @@
 package com.payment.payment_processing_system.service;
 
+import com.payment.payment_processing_system.dto.CustomerAccountResponse;
+import com.payment.payment_processing_system.dto.CustomerListItemResponse;
 import com.payment.payment_processing_system.dto.CustomerResponse;
 import com.payment.payment_processing_system.dto.TransactionResponse;
 
@@ -15,7 +17,29 @@ public interface CustomerService {
      *
      * @return a List of all CustomerResponse objects
      */
-    List<CustomerResponse> getAllCustomers();
+    List<CustomerListItemResponse> getAllCustomers();
+
+    /**
+     * Retrieve all active accounts for a specific customer.
+     *
+     * @param customerId the ID of the customer
+     * @return a List of active accounts for the customer
+     */
+    List<CustomerAccountResponse> getActiveAccountsByCustomerId(Long customerId);
+
+    /**
+     * Retrieve all active accounts by a customer identifier.
+     * At least one identifier must be provided.
+     * If multiple identifiers are provided, priority is: email > phone > name
+     *
+     * @param customerName customer name (optional)
+     * @param email customer email (optional)
+     * @param phoneNumber customer phone number (optional)
+     * @return a List of active accounts for the matched customer
+     * @throws IllegalArgumentException if no identifiers provided or if name matches are ambiguous
+     * @throws CustomerNotFoundException if customer not found with provided identifier
+     */
+    List<CustomerAccountResponse> getActiveAccountsByCustomerIdentifier(String customerName, String email, String phoneNumber);
 
     /**
      * Retrieve a customer by their customer ID.

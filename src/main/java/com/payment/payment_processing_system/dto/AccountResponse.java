@@ -1,27 +1,28 @@
 package com.payment.payment_processing_system.dto;
 
 import com.payment.payment_processing_system.enums.CurrencyType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
 /**
- * DTO for customer response containing customer and account information.
+ * DTO for exposing safe account details.
  */
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CustomerResponse {
+public class AccountResponse {
 
-    private Long customerId;
+    private String accountNumber;
+    private String bankName;
+    private String ifscCode;
+    private BigDecimal balance;
     private String customerName;
     private String email;
-    private String phoneNumber;
-    private String accountNumber;
-    private String ifscCode;
-    private String bankName;
-    private BigDecimal balance;
     private CurrencyType currency;
 }
 

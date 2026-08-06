@@ -3,6 +3,7 @@ package com.payment.payment_processing_system.exception;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.payment.payment_processing_system.dto.PaymentRequest;
+import com.payment.payment_processing_system.dto.PreviewPaymentRequest;
 import com.payment.payment_processing_system.service.PaymentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -149,6 +150,21 @@ class GlobalExceptionHandlerIntegrationTest {
     }
 
     @Test
+    @DisplayName("UnsupportedExchangeRateException should map to 400 UNSUPPORTED_EXCHANGE_RATE")
+    void unsupportedExchangeRate_shouldReturnBadRequest() throws Exception {
+        when(paymentService.previewPayment(any(PreviewPaymentRequest.class)))
+                .thenThrow(new UnsupportedExchangeRateException("Unsupported exchange rate for currency pair: EUR -> GBP"));
+
+        HttpResponse<String> httpResponse = postJson("/api/payments/preview", validPreviewRequestJson(), null);
+        JsonNode body = objectMapper.readTree(httpResponse.body());
+
+        assertThat(httpResponse.statusCode()).isEqualTo(400);
+        assertThat(body.path("errorCode").asText()).isEqualTo("UNSUPPORTED_EXCHANGE_RATE");
+        assertThat(body.path("message").asText()).isEqualTo("Unsupported exchange rate for currency pair: EUR -> GBP");
+        assertThat(body.path("path").asText()).isEqualTo("/api/payments/preview");
+    }
+
+    @Test
     @DisplayName("Unhandled exception should map to 500 PROCESSING_ERROR")
     void unexpectedException_shouldReturnInternalServerError() throws Exception {
         when(paymentService.getTransaction("TXN-500"))
@@ -202,6 +218,15 @@ class GlobalExceptionHandlerIntegrationTest {
                 .amount(new BigDecimal("10.00"))
                 .description("global-exception-test")
                 .upiPin("1234")
+                .build();
+        return objectMapper.writeValueAsString(request);
+    }
+
+    private String validPreviewRequestJson() throws Exception {
+        PreviewPaymentRequest request = PreviewPaymentRequest.builder()
+                .senderAccountNumber("100000000001")
+                .receiverAccountNumber("100000000002")
+                .amount(new BigDecimal("10.00"))
                 .build();
         return objectMapper.writeValueAsString(request);
     }

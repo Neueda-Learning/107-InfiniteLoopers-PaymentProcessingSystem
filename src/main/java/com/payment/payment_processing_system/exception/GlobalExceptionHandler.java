@@ -2,6 +2,7 @@ package com.payment.payment_processing_system.exception;
 
 import com.payment.payment_processing_system.dto.ErrorResponse;
 import com.payment.payment_processing_system.enums.ErrorCode;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -74,6 +76,39 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            ConstraintViolationException ex, HttpServletRequest request) {
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getMessage())
+                .collect(Collectors.joining("; "));
+        log.error("Constraint validation failed: {}", message);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, message, request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String message = "Invalid value for parameter '" + ex.getName() + "'";
+        log.error("Path/query parameter type mismatch: {}", message);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, message, request);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        log.error("Invalid request argument: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(UnsupportedExchangeRateException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedExchangeRateException(
+            UnsupportedExchangeRateException ex, HttpServletRequest request) {
+        log.error("Unsupported exchange rate: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ErrorCode.UNSUPPORTED_EXCHANGE_RATE, ex.getMessage(), request);
+    }
+
     // ─── 401 Unauthorized ─────────────────────────────────────────────────────
 
     @ExceptionHandler(InvalidUpiPinException.class)
@@ -99,6 +134,13 @@ public class GlobalExceptionHandler {
             InsufficientBalanceException ex, HttpServletRequest request) {
         log.error("Insufficient balance: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.INSUFFICIENT_FUNDS, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(DailyTransactionLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleDailyTransactionLimitExceededException(
+            DailyTransactionLimitExceededException ex, HttpServletRequest request) {
+        log.error("Daily transaction limit exceeded: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.DAILY_TRANSACTION_LIMIT_EXCEEDED, ex.getMessage(), request);
     }
 
     // ─── 429 Too Many Requests ────────────────────────────────────────────────
