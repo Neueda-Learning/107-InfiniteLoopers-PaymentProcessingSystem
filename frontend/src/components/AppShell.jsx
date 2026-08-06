@@ -13,10 +13,10 @@ export function AppShell() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
-          <span className="brand-badge">PPS</span>
+          <img className="brand-badge" src="/paypilot-logo.svg" alt="PayPilot logo" />
           <div>
-            <h1>Payment Processing System</h1>
-            <p>React frontend connected to your Spring Boot APIs.</p>
+            <h1>PayPilot</h1>
+            <p>where every transaction matters</p>
           </div>
         </div>
 
@@ -32,10 +32,6 @@ export function AppShell() {
           ))}
         </nav>
 
-        <div className="sidebar-footnote">
-          <p>Backend base path: <code>/api</code></p>
-          <p>Recommended backend URL: <code>http://localhost:8080</code></p>
-        </div>
       </aside>
 
       <main className="main-panel">
