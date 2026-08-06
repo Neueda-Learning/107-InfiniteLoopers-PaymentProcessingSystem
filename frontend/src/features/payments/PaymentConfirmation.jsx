@@ -11,7 +11,7 @@ export function PaymentConfirmation({
   canSubmit,
 }) {
   return (
-    <SectionCard title="Step 4: Confirm and send" subtitle="Enter UPI PIN and submit using POST /api/payments/send.">
+    <SectionCard title="Step 4: Confirm and send" subtitle="Authorize this transfer using your 4-digit UPI PIN.">
       <form
         className="form-grid"
         onSubmit={(event) => {

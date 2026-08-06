@@ -7,7 +7,7 @@ export function PaymentSuccess({ result, onCreateAnother }) {
   }
 
   return (
-    <SectionCard title="Step 5: Transaction result" subtitle="Payment response from backend.">
+    <SectionCard title="Step 5: Transaction result" subtitle="Transfer confirmation and reference details.">
       <div className="detail-stack">
         <div className="detail-grid">
           <div>

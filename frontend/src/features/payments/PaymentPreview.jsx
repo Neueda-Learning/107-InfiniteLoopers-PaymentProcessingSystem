@@ -23,7 +23,7 @@ export function PaymentPreview({
   const canPreview = !disabled && Number(amount) > 0;
 
   return (
-    <SectionCard title="Step 3: Preview conversion and charges" subtitle="Preview uses POST /api/payments/preview before confirmation.">
+    <SectionCard title="Step 3: Preview conversion and charges" subtitle="Review conversion, charges, and final debit before sending.">
       <div className="detail-stack">
         <label>
           <span>Amount{senderCurrency ? ` (${senderCurrency})` : ''}</span>

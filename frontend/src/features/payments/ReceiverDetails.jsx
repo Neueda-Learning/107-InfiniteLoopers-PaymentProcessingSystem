@@ -7,11 +7,12 @@ export function ReceiverDetails({
   receiver,
   loading,
   disabled,
+  showLookupButton = true,
 }) {
   const canLookup = !disabled && receiverAccountNumber.trim().length > 0;
 
   return (
-    <SectionCard title="Step 2: Enter receiver" subtitle="Fetch account details using GET /api/customers/account/{accountNumber}.">
+    <SectionCard title="Step 2: Enter receiver" subtitle="Enter account number and verify receiver details.">
       <div className="detail-stack">
         <label>
           <span>Receiver account number</span>
@@ -23,9 +24,11 @@ export function ReceiverDetails({
               inputMode="numeric"
               disabled={disabled}
             />
-            <button type="button" className="secondary-button" onClick={onLookupReceiver} disabled={!canLookup || loading}>
-              {loading ? 'Fetching...' : 'Fetch Receiver'}
-            </button>
+            {showLookupButton ? (
+              <button type="button" className="secondary-button" onClick={onLookupReceiver} disabled={!canLookup || loading}>
+                {loading ? 'Fetching...' : 'Verify Receiver'}
+              </button>
+            ) : null}
           </div>
         </label>
 

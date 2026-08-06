@@ -7,7 +7,7 @@ export function CustomerSelector({
   loading,
 }) {
   return (
-    <SectionCard title="Step 1: Select sender" subtitle="Choose the customer initiating the transfer.">
+    <SectionCard title="Step 1: Select sender" subtitle="Choose who is making this transfer.">
       <label>
         <span>Sender customer</span>
         <select

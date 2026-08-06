@@ -46,3 +46,4 @@ frontend/dist/
 
 # Frontend build output
 frontend/dist/
+node_modules/
