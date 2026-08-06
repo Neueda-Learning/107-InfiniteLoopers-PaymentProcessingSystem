@@ -1,64 +1,110 @@
-# Payment Processing System - Backend Tasks
+# Payment Processing System
 
-## Tasks
+Spring Boot + React/Vite payment system with Docker, Docker Compose, and Jenkins CI/CD support.
 
-### 1. Audit Trail for Support Staff
-- Add audit logging for all failed validations and payment issues.
-- Track events like:
-  - Wrong UPI PIN
-  - Invalid account details
-  - Payment failures
-  - Validation errors
-- Support staff should be able to view failure reasons and timestamps.
+## Tech Stack
 
----
+- Backend: Java 17, Spring Boot, Maven, Flyway, JPA
+- Frontend: React 18, Vite
+- Database: MySQL 8.4
+- Deployment: Docker + Docker Compose
+- CI/CD: Jenkins pipeline in `Jenkinsfile`
 
-### 2. Real-Time Account Number Validation
-- Validate account number while the user is typing.
-- Handle:
-  - Non-numeric input
-  - Minimum/maximum account number length
-  - Invalid account formats
-- Show errors instantly without waiting for the send button.
+## Container Architecture
 
----
+- `frontend` (Nginx): serves static React app on port `80`
+- `backend` (Spring Boot): API on port `8080`
+- `mysql` (MySQL 8.4): database on port `3306`
+- Frontend proxies `/api` -> `backend:8080` via `frontend/nginx.conf`
 
-### 3. Payment Cancellation Window
-- Provide a 5-second window after clicking "Send Payment".
-- Show a "Cancel Payment" option during this period.
-- Update transaction status accordingly if cancelled.
+## Files Added For Deployment
 
----
+- `Dockerfile` (backend image)
+- `frontend/Dockerfile` (frontend image)
+- `frontend/nginx.conf` (SPA + API reverse proxy)
+- `docker-compose.yml` (full stack)
+- `.dockerignore` (smaller build context)
+- `.env.example` (environment template)
+- `Jenkinsfile` (CI/CD pipeline)
 
-### 3. Payment > 10000
-- Provide a pop up where customer should get an alert.
-- Show a "Cancel Payment" option during this period.
-- Update transaction status accordingly if cancelled.
+## Linux Deployment (Docker Compose)
 
----
+1. Create runtime env file from template.
+2. Update secrets before starting services.
+3. Validate compose file.
+4. Start all services.
 
-### 4. Duplicate Payment Detection
-- Detect repeated payments with:
-  - Same sender
-  - Same receiver
-  - Same amount
-- Show confirmation popup:
-  > "You have already made this payment. Do you want to continue?"
+```bash
+cp .env.example .env
+# Edit .env and set strong MYSQL_PASSWORD and MYSQL_ROOT_PASSWORD
+docker compose --env-file .env config
+docker compose --env-file .env up -d --build
+```
 
----
+Useful commands:
 
-### 5. Multiple Account Support
-- Allow a single user to create multiple accounts.
-- Provide separate dashboards for each account.
-- Each dashboard should show:
-  - Balance
-  - Transactions
-  - Account details
+```bash
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f mysql
+docker compose down
+```
 
----
+## Environment Variables
 
-## Good To Have
+Main runtime values are documented in `.env.example`.
 
-### Currency Conversion
-- Add currency conversion support.
-- Show latest exchange rates before international payments.
+Required for deployment:
+
+- `MYSQL_PASSWORD`
+- `MYSQL_ROOT_PASSWORD`
+
+Common optional settings:
+
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `MAIL_FROM`
+- `APP_MAIL_ENABLED`
+
+## Jenkins CI/CD
+
+Pipeline file: `Jenkinsfile`
+
+Default pipeline flow:
+
+1. Checkout source
+2. Run backend tests (`./mvnw clean verify`)
+3. Build frontend (`npm ci` + `npm run build`)
+4. Build Docker images
+5. Optional image push
+6. Optional `docker compose` deployment
+
+Key Jenkins parameters:
+
+- `BUILD_DOCKER_IMAGES`
+- `PUSH_IMAGES`
+- `DEPLOY_WITH_COMPOSE`
+- `DOCKER_REGISTRY`
+- `DOCKER_REPOSITORY`
+- `DOCKER_REGISTRY_CREDENTIALS_ID`
+- `IMAGE_TAG`
+
+If deployment is enabled, Jenkins requires:
+
+- `MYSQL_PASSWORD`
+- `MYSQL_ROOT_PASSWORD`
+
+## Local Backend Without Docker (Optional)
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+## Frontend Development (Optional)
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```

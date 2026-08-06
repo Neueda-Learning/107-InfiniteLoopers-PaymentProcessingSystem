@@ -1,0 +1,16 @@
+target/
+frontend/node_modules/
+frontend/dist/
+logs/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+*.log
+.local-db/
+node_modules/
+Dockerfile*
+docker-compose*.yml
+README.md
+
