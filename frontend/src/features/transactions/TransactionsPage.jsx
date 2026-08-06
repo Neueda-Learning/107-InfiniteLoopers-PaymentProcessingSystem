@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getAllTransactions, getTransactionById, retryPayment } from '../../api/paymentApi';
+import { getAllCustomers } from '../../api/customerApi';
 import {
   DataTable,
   EmptyState,
@@ -11,7 +12,6 @@ import {
   SuccessAlert,
 } from '../../components/UI';
 import {
-  PAYMENT_STATUSES,
   buildTransactionTimeline,
   formatCurrency,
   formatDateTime,
@@ -20,12 +20,13 @@ import {
 
 export function TransactionsPage() {
   const [transactions, setTransactions] = useState([]);
+  const [customerAccountById, setCustomerAccountById] = useState({});
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [retryingId, setRetryingId] = useState('');
-  const [query, setQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [customerSearchInput, setCustomerSearchInput] = useState('');
+  const [appliedCustomerId, setAppliedCustomerId] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -34,16 +35,25 @@ export function TransactionsPage() {
     setError('');
 
     try {
-      const data = await getAllTransactions();
-      setTransactions(data);
+      const [transactionData, customerData] = await Promise.all([
+        getAllTransactions(),
+        getAllCustomers(),
+      ]);
+      setTransactions(transactionData);
+      setCustomerAccountById(
+        customerData.reduce((acc, customer) => {
+          acc[String(customer.customerId)] = customer.accountNumber;
+          return acc;
+        }, {}),
+      );
 
       if (selectTransactionId) {
-        const match = data.find((transaction) => transaction.transactionId === selectTransactionId);
+        const match = transactionData.find((transaction) => transaction.transactionId === selectTransactionId);
         if (match) {
           setSelectedTransaction(match);
         }
-      } else if (!selectedTransaction && data.length) {
-        setSelectedTransaction(data[0]);
+      } else if (!selectedTransaction && transactionData.length) {
+        setSelectedTransaction(transactionData[0]);
       }
     } catch (err) {
       setError(err.message || 'Unable to load transactions.');
@@ -57,20 +67,31 @@ export function TransactionsPage() {
   }, []);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((transaction) => {
-      const matchesStatus = statusFilter === 'ALL' || transaction.paymentStatus === statusFilter;
-      const searchable = [
-        transaction.transactionId,
-        transaction.senderAccountNumber,
-        transaction.receiverAccountNumber,
-        transaction.description,
-      ]
-        .join(' ')
-        .toLowerCase();
-      const matchesQuery = searchable.includes(query.trim().toLowerCase());
-      return matchesStatus && matchesQuery;
-    });
-  }, [transactions, query, statusFilter]);
+    if (!appliedCustomerId.trim()) {
+      return transactions;
+    }
+
+    const accountNumber = customerAccountById[appliedCustomerId.trim()];
+    if (!accountNumber) {
+      return [];
+    }
+
+    return transactions.filter(
+      (transaction) =>
+        transaction.senderAccountNumber === accountNumber
+        || transaction.receiverAccountNumber === accountNumber,
+    );
+  }, [transactions, appliedCustomerId, customerAccountById]);
+
+  function handleCustomerSearch(event) {
+    event.preventDefault();
+    setAppliedCustomerId(customerSearchInput.trim());
+  }
+
+  function handleClearCustomerSearch() {
+    setCustomerSearchInput('');
+    setAppliedCustomerId('');
+  }
 
   async function handleSelectTransaction(transactionId) {
     setDetailsLoading(true);
@@ -114,25 +135,17 @@ export function TransactionsPage() {
       <ErrorAlert message={error} onDismiss={() => setError('')} />
       <SuccessAlert message={successMessage} onDismiss={() => setSuccessMessage('')} />
 
-      <SectionCard title="Search and filter" subtitle="Client-side filters layered on top of `GET /api/payments`.">
-        <div className="filter-row">
+      <SectionCard title="Search transactions">
+        <form className="filter-row" onSubmit={handleCustomerSearch}>
           <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by transaction ID, sender, receiver, or description"
+            value={customerSearchInput}
+            onChange={(event) => setCustomerSearchInput(event.target.value)}
+            placeholder="Search by customer ID"
           />
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="ALL">All statuses</option>
-            {PAYMENT_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <button type="button" className="secondary-button" onClick={() => loadTransactions()}>
-            Refresh
-          </button>
-        </div>
+          <button type="submit" className="primary-button">Search</button>
+          <button type="button" className="ghost-button" onClick={handleClearCustomerSearch}>Clear</button>
+          <button type="button" className="secondary-button" onClick={() => loadTransactions()}>Refresh</button>
+        </form>
       </SectionCard>
 
       <div className="content-grid content-grid--2col">

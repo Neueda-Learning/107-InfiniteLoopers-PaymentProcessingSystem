@@ -28,6 +28,8 @@ export function CustomersPage() {
   const [error, setError] = useState('');
   const [accountLookup, setAccountLookup] = useState('');
   const [customerIdLookup, setCustomerIdLookup] = useState('');
+  const [lookupType, setLookupType] = useState('account');
+  const [lookupValue, setLookupValue] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -80,37 +82,25 @@ export function CustomersPage() {
     }
   }
 
-  async function handleAccountLookup(event) {
+  async function handleCustomerLookup(event) {
     event.preventDefault();
-    if (!accountLookup.trim()) {
+    if (!lookupValue.trim()) {
       return;
     }
 
     setError('');
 
     try {
-      const customer = await getCustomerByAccount(accountLookup.trim());
+      const customer =
+        lookupType === 'account'
+          ? await getCustomerByAccount(lookupValue.trim())
+          : await getCustomerById(lookupValue.trim());
       setSelectedCustomer(customer);
       await handleCustomerSelection(customer);
     } catch (err) {
-      setError(err.message || 'Customer lookup failed.');
-    }
-  }
-
-  async function handleCustomerIdLookup(event) {
-    event.preventDefault();
-    if (!customerIdLookup.trim()) {
-      return;
-    }
-
-    setError('');
-
-    try {
-      const customer = await getCustomerById(customerIdLookup.trim());
-      setSelectedCustomer(customer);
-      await handleCustomerSelection(customer);
-    } catch (err) {
-      setError(err.message || 'Customer lookup by ID failed.');
+      setError(
+        err.message || `Customer lookup by ${lookupType === 'account' ? 'account number' : 'ID'} failed.`,
+      );
     }
   }
 
@@ -139,37 +129,34 @@ export function CustomersPage() {
       <ErrorAlert message={error} onDismiss={() => setError('')} />
 
       <div className="content-grid content-grid--3col">
-        <SectionCard title="Lookup tools" subtitle="Use either account number or customer ID.">
-          <form className="stack-form" onSubmit={handleAccountLookup}>
+        <SectionCard title="Find Customer" subtitle="Choose a lookup method and enter the value.">
+          <form className="stack-form" onSubmit={handleCustomerLookup}>
             <label>
-              <span>Find by account number</span>
-              <input
-                value={accountLookup}
-                onChange={(event) => setAccountLookup(event.target.value)}
-                placeholder="100000000001"
-              />
+              <span>Lookup type</span>
+              <select value={lookupType} onChange={(event) => setLookupType(event.target.value)}>
+                <option value="account">Account number</option>
+                <option value="id">Customer ID</option>
+              </select>
             </label>
-            <button type="submit" className="secondary-button">
-              Search account
-            </button>
-          </form>
 
-          <form className="stack-form" onSubmit={handleCustomerIdLookup}>
             <label>
-              <span>Find by customer ID</span>
+              <span>
+                {lookupType === 'account' ? 'Account number' : 'Customer ID'}
+              </span>
               <input
-                value={customerIdLookup}
-                onChange={(event) => setCustomerIdLookup(event.target.value)}
-                placeholder="1"
+                value={lookupValue}
+                onChange={(event) => setLookupValue(event.target.value)}
+                placeholder={lookupType === 'account' ? '100000000001' : '1'}
               />
             </label>
+
             <button type="submit" className="secondary-button">
-              Search customer ID
+              Search
             </button>
           </form>
         </SectionCard>
 
-        <SectionCard title="Customer directory" subtitle="Fetched from `GET /api/customers`." className="span-2">
+        <SectionCard title="Customer directory" className="span-2">
           {loading ? (
             <LoadingState label="Loading customers..." />
           ) : (
@@ -196,7 +183,7 @@ export function CustomersPage() {
       </div>
 
       <div className="content-grid content-grid--2col">
-        <SectionCard title="Selected customer" subtitle="Details from the `CustomerResponse` DTO.">
+        <SectionCard title="Selected customer">
           {selectedCustomer ? (
             <div className="detail-grid">
               <div>
@@ -237,7 +224,7 @@ export function CustomersPage() {
           )}
         </SectionCard>
 
-        <SectionCard title="Transaction preview" subtitle="Fetched from `GET /api/customers/transaction/{transactionId}`.">
+        <SectionCard title="Transaction preview">
           {transactionLoading ? (
             <LoadingState label="Loading transaction detail..." />
           ) : selectedTransaction ? (
@@ -273,7 +260,7 @@ export function CustomersPage() {
         </SectionCard>
       </div>
 
-      <SectionCard title="Transaction history" subtitle="Full account activity using `GET /api/customers/{accountNumber}/transactions`.">
+      <SectionCard title="Transaction history">
         {historyLoading ? (
           <LoadingState label="Loading transaction history..." />
         ) : (

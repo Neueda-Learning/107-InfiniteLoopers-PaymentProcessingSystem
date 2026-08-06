@@ -97,15 +97,12 @@ code {
 }
 
 .brand-badge {
-  width: 44px;
-  height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #38bdf8, #2563eb);
-  color: white;
-  font-weight: 700;
+  width: 56px;
+  height: 56px;
+  display: block;
+  flex-shrink: 0;
+  border-radius: 16px;
+  object-fit: contain;
 }
 
 .sidebar-nav {
