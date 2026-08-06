@@ -533,6 +533,18 @@ th {
   text-align: right;
 }
 
+.payment-flow-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.preview-panel {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: rgba(30, 41, 59, 0.45);
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

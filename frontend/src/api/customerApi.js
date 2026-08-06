@@ -44,6 +44,30 @@ export function getAllCustomers() {
   });
 }
 
+// Payment-flow specific helpers mapped to backend DTOs.
+export async function getCustomers() {
+  const response = await apiRequest('/customers');
+
+  return (response || []).map((customer) => ({
+    id: customer.id,
+    customerName: customer.customerName,
+  }));
+}
+
+export async function getCustomerAccounts(customerId) {
+  const response = await apiRequest(`/customers/${customerId}/accounts`);
+
+  return (response || []).map((account) => ({
+    accountId: account.accountId,
+    accountNumber: account.accountNumber,
+    bankName: account.bankName,
+    ifscCode: account.ifscCode,
+    balance: account.balance,
+    currency: account.currency,
+    isActive: Boolean(account.isActive),
+  }));
+}
+
 export function getCustomerById(customerId) {
   if (DEMO_MODE) {
     return findDemoCustomerById(customerId);
@@ -70,6 +94,20 @@ export function getCustomerByAccount(accountNumber) {
 
     throw error;
   });
+}
+
+export async function getAccountByNumber(accountNumber) {
+  const response = await apiRequest(`/customers/account/${accountNumber}`);
+
+  return {
+    customerId: response?.customerId,
+    customerName: response?.customerName,
+    accountNumber: response?.accountNumber,
+    ifscCode: response?.ifscCode,
+    bankName: response?.bankName,
+    balance: response?.balance,
+    currency: response?.currency,
+  };
 }
 
 export function getCustomerTransactions(accountNumber) {

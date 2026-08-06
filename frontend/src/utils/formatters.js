@@ -1,10 +1,14 @@
 export const PAYMENT_STATUSES = ['CREATED', 'VALIDATED', 'SENT', 'COMPLETED', 'FAILED'];
 
-export function formatCurrency(value) {
+export function formatCurrency(value, currency = 'INR') {
   const amount = Number(value ?? 0);
-  return new Intl.NumberFormat('en-IN', {
+  const safeCurrency = typeof currency === 'string' && currency.trim() ? currency : 'INR';
+
+  const locale = safeCurrency === 'INR' ? 'en-IN' : 'en-US';
+
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'INR',
+    currency: safeCurrency,
     maximumFractionDigits: 2,
   }).format(Number.isFinite(amount) ? amount : 0);
 }
