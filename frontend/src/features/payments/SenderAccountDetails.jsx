@@ -9,7 +9,7 @@ export function SenderAccountDetails({
   const senderAccount = accounts.find((account) => account.accountNumber === selectedAccountNumber) || null;
 
   return (
-    <SectionCard title="Sender details" subtitle="Account information comes from GET /api/customers/{customerId}/accounts.">
+    <SectionCard title="Sender details" subtitle="Read-only details for the account to be debited.">
       {!accounts.length ? (
         <EmptyState
           title="No active accounts"
@@ -22,7 +22,7 @@ export function SenderAccountDetails({
             <select value={selectedAccountNumber} onChange={(event) => onSelectAccount(event.target.value)}>
               {accounts.map((account) => (
                 <option key={account.accountId} value={account.accountNumber}>
-                  {account.accountNumber} - {account.bankName}
+                  {account.accountNumber} | {account.bankName}
                 </option>
               ))}
             </select>
