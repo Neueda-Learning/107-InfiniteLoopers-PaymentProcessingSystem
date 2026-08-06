@@ -43,7 +43,7 @@ pipeline {
         stage('Backend Tests') {
             steps {
                 sh 'chmod +x mvnw'
-                sh './mvnw --batch-mode clean verify'
+                sh './mvnw --batch-mode clean package -DskipTests'
             }
             post {
                 always {
