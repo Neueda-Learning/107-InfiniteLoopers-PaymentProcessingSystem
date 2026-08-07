@@ -109,14 +109,14 @@ pipeline {
                     : "${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set in Jenkins for deployment}"
                     cat > .env <<EOF
 MYSQL_DATABASE=${MYSQL_DATABASE:-payment_processing_db}
-MYSQL_USER=${MYSQL_USER:-payment_user}
-MYSQL_PASSWORD=${MYSQL_PASSWORD}
-MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+MYSQL_USER=$root
+MYSQL_PASSWORD=$n3u3da!
+MYSQL_ROOT_PASSWORD=$n3u3da!
 SPRING_PROFILES_ACTIVE=mysql
 SERVER_PORT=8080
 DB_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-payment_processing_db}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-DB_USERNAME=${MYSQL_USER:-payment_user}
-DB_PASSWORD=${MYSQL_PASSWORD}
+DB_USERNAME=$root
+DB_PASSWORD=$n3u3da!
 MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
 MAIL_PORT=${MAIL_PORT:-587}
 MAIL_USERNAME=${MAIL_USERNAME:-}
